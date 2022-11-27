@@ -1,0 +1,96 @@
+.searchbar {
+  margin-bottom: auto;
+  margin-top: auto;
+  height: 4rem;
+  background-color: #353b48;
+  border-radius: 30px;
+  padding: 10px;
+}
+
+.search_input {
+  color: white;
+  border: 0;
+  outline: 0;
+  background: none;
+  width: 0;
+  caret-color: transparent;
+  line-height: 40px;
+  transition: width 0.4s linear;
+}
+
+@media (min-width: 768px) {
+  .searchbar:hover form .search_input {
+    padding: 0 10px;
+    width: 450px;
+    caret-color: red;
+    transition: width 0.4s linear;
+  }
+}
+
+@media (min-width: 768px) {
+  .searchbar:hover > .searchbar {
+    width: 450px;
+  }
+}
+
+@media (min-width: 768px) {
+  .searchbar:hover form .searchbar {
+    padding: 0 10px;
+    width: 450px;
+    caret-color: red;
+    transition: width 0.4s linear;
+  }
+}
+
+@media (min-width: 767px) {
+  .searchbar:hover form .search_icon {
+    background: white;
+    color: #e74c3c;
+  }
+}
+
+.searchbar:hover form .search_icon {
+  background: white;
+  color: #e74c3c;
+}
+
+.search_icon {
+  height: 40px;
+  width: 40px;
+  float: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color: white;
+  text-decoration: none;
+}
+
+.search_input {
+}
+
+@media (max-width: 767px) {
+  .search_input {
+    width: 16rem;
+  }
+}
+
+.navbar-collapse {
+}
+
+#background-card {
+  background: url("../../assets/img/sfondo2.png?h=e0ddddf11096f08eb7f22304572ffa08") center / cover no-repeat;
+  background-attachment: fixed;
+  -webkit-filter: blur(3px);
+  filter: blur(3px);
+}
+
+.searchbar: hover {
+}
+
+@media (max-width: 572px) {
+  input {
+    width: 100%;
+  }
+}
+

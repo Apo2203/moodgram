@@ -15,24 +15,17 @@ if ($_POST["password"] !== $_POST["passwordConfirm"]){
     die("The two passwords must be the same");
 }
 $hashedPassword = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
 $mysqli = require __DIR__ . "/database.php";
-
-
-$select = mysqli_query($mysqli, "SELECT * FROM users WHERE email = '".$_POST["email"]."'");
-if(mysqli_num_rows($select)) {
-    exit('This email address is already used!');
-}
-if (! $stmt->prepare($sql)) {
-    die("SQL error: " . $mysqli->error);
-}
 
 $sql = "INSERT INTO user (name, surname, email, password_hash, age)
         VALUES (?, ?, ?, ?, ?)";
 
-
 $stmt = $mysqli->stmt_init();
 
-
+if (! $stmt->prepare($sql)) {
+    die("SQL error: " . $mysqli->error);
+}
 
 $stmt->bind_param("ssssi",
                   $_POST["name"],
@@ -44,7 +37,5 @@ $stmt->bind_param("ssssi",
 if ($stmt->execute()) {
     echo "Signup completed succesfully!";
 } 
-else {
-    die($mysqli->error . " " . $mysqli->errno);
-}
+
 ?>

@@ -1,3 +1,25 @@
+<?php
+$is_invalid = false; // value useful to know if the login information are valid or no
+
+if ($_SERVER["REQUEST_METHOD"] === "POST"){
+    $mysqli = require __DIR__ . "/../dataBase/database.php";
+    $sql = sprintf("SELECT * FROM user WHERE email = '%s'", $mysqli->real_escape_string($_POST["email"]));
+    
+    $result = $mysqli->query($sql);
+    $user = $result->fetch_assoc();
+    
+
+    if ($user) {
+        if (password_verify($_POST["password"], $user["password_hash"])){
+            session_start();
+            $_SESSION["user_id"] = $user["id"];
+            header("Location: home.php");
+            exit;       
+        }
+    }
+    $is_invalid = true;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,7 +39,7 @@
 
 <body id="hero">
     <nav class="navbar navbar-dark navbar-expand-md bg-dark py-3">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="index.html" style="font-family: Aboreto, serif;"><span class="fs-2">MoodGram</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-5"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="container"><a class="navbar-brand d-flex align-items-center" href="index.php" style="font-family: Aboreto, serif;"><span class="fs-2">MoodGram</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-5"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-5">
                 <ul class="navbar-nav ms-auto" style="height: 4px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="register.html" style="padding: 8px 14px;">Sign Up</a>
             </div>
@@ -37,10 +59,14 @@
                             <div class="bs-icon-xl bs-icon-circle bs-icon-primary bs-icon my-4"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-person">
                                     <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"></path>
                                 </svg></div>
-                            <form class="text-center" method="post">
-                                <div class="mb-3"><input class="form-control" type="email" name="email" placeholder="Email" required="" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"></div>
-                                <div class="mb-3"><input class="form-control" type="password" name="password" placeholder="Password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
-                                <div class="mb-3"><a class="btn btn-primary d-block w-100" role="button" href="home.html">Login</a></div><a class="btn btn-primary d-block w-100" role="button" href="register.html">Create new account</a>
+                                <form class="text-center" method="post">
+                                    <div class="mb-3"><input class="form-control" type="email" name="email" id="email" placeholder="Email" required="" value="<?= htmlspecialchars($_POST["email"] ?? "")?>" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"></div>
+                                    <div class="mb-3"><input class="form-control" type="password" name="password" id="password" placeholder="Password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
+                                    <?php if ($is_invalid):?>
+                                        <em> Invalid login information </em>
+                                    <?php endif; ?>
+                                <button class="btn btn-primary d-block w-100 mb-3" type="submit">Login</button>
+                                <a class="btn btn-primary d-block w-100" role="button" href="register.html">Create new account</a>
                             </form>
                         </div>
                     </div>

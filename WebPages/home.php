@@ -1,28 +1,29 @@
 <?php
+    $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
 ?>
 
 
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>dashboardpost</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css?h=025df1ec88740cad5ff14bb3380da6dd">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abel&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Aboreto&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins&amp;display=swap">
-    <link rel="stylesheet" href="../assets/fonts/fontawesome-all.min.css?h=5aae26cfc631423a28ee9f3eea8618b0">
-    <link rel="stylesheet" href="../assets/css/aos.min.css?h=ea67d3638a91cd05d22f1b4e31c7b746">
-    <link rel="stylesheet" href="../assets/css/animate.min.css?h=5512c3e92e3931978c9ddcc7dbeed22b">
-    <link rel="stylesheet" href="../assets/css/navbarStyle.css?h=befd8a398792e305b7ffd4a176b5b585">
-    <link rel="stylesheet" href="../assets/css/searchBarAnimation.css?h=705ee09c845e6a0566bbf75e428a898f">
-    <link rel="stylesheet" href="../assets/css/styles.css?h=398dee27db98ce7d017f9be833b45a5a">
-</head>
-
-<body style="background: #025891;">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+        <title>dashboardpost</title>
+        <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css?h=025df1ec88740cad5ff14bb3380da6dd">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abel&amp;display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Aboreto&amp;display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins&amp;display=swap">
+        <link rel="stylesheet" href="../assets/fonts/fontawesome-all.min.css?h=5aae26cfc631423a28ee9f3eea8618b0">
+        <link rel="stylesheet" href="../assets/css/aos.min.css?h=ea67d3638a91cd05d22f1b4e31c7b746">
+        <link rel="stylesheet" href="../assets/css/animate.min.css?h=5512c3e92e3931978c9ddcc7dbeed22b">
+        <link rel="stylesheet" href="../assets/css/navbarStyle.css?h=befd8a398792e305b7ffd4a176b5b585">
+        <link rel="stylesheet" href="../assets/css/searchBarAnimation.css?h=705ee09c845e6a0566bbf75e428a898f">
+        <link rel="stylesheet" href="../assets/css/styles.css?h=398dee27db98ce7d017f9be833b45a5a">
+    </head>
+    
+    <body style="background: #025891;">
+    <?php if (isset($_SESSION["user_id"])): ?>
     <nav class="navbar navbar-dark navbar-expand-md bg-dark py-3" style="--bs-success: #ffffff;--bs-success-rgb: 255,255,255;">
         <div class="container"><a class="navbar-brand d-flex align-items-center" href="index.php" style="font-family: Aboreto, serif;"><span class="fs-2">MoodGram</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-5"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-5" style="padding-left: 0;width: 300px;">
@@ -31,7 +32,7 @@
                         <form class="d-sm-flex d-xxl-flex justify-content-sm-center align-items-sm-center justify-content-xxl-center align-items-xxl-center" action="userList.html" method="post"><input type="text" class="search_input" placeholder="Search user..."><a class="btn search-icon" role="button" href="userList.html"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></a></form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="MyProfile.html" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.html" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="index.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="MyProfile.html" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.html" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>
@@ -46,29 +47,48 @@
             </div>
         </section>
         <section style="margin-top: 10rem;">
-            <div class="container Cardsize" style="margin-bottom: 7rem;">
-                <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
-                    <div class="col">
-                        <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;"><span style="font-weight: normal !important;">Francesco Apollonio &amp; Gabriele Scamardo</span></p><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 3rem;border-radius: 3rem;"></a>
-                        <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>75%</strong></p><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>
-                        <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>25%</strong></p>
-                        <div>
-                            <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>21 Novembre 2022</em></p>
-                            <div class="dropend float-end"><button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;"><i class="far fa-sun"></i></button>
-                                <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;"><a class="dropdown-item" href="#">Report Post</a><a class="dropdown-item" href="#" style="color: rgb(255,0,0);">Delete post</a></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" style="margin: 0;">
-                    <div class="col col-style-sx" data-bss-hover-animate="pulse"><a href="#">
-                            <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i></div>
-                        </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger.png?h=e0aa4534da8ccd026056745bbc4a9199"></div>
-                    <div class="col col-style-dx" data-bss-hover-animate="pulse"><a href="#">
-                            <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
-                        </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger%20(1).png?h=fa6df617871770de8ed2775f9ba4ac8f"></div>
-                </div>
-            </div>
+            <?php
+                
+                $sql = "SELECT p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2 FROM post p, user u1, user u2 WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id";
+                
+                $result = $mysqli->query($sql);
+                
+                if (TRUE) {
+                    while ($data = $result->fetch_assoc())
+                    {
+                        echo('
+                                <div class="container Cardsize" style="margin-bottom: 7rem;">
+                                    <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
+                                        <div class="col">
+                                            <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;"><span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span></p>
+                                            <a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>75%</strong></p><a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>25%</strong></p>
+                                            <div>
+                                                <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>21 Novembre 2022</em></p>
+                                                <div class="dropend float-end"><button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;"><i class="far fa-sun"></i></button>
+                                                    <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;"><a class="dropdown-item" href="#">Report Post</a><a class="dropdown-item" href="#" style="color: rgb(255,0,0);">Delete post</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin: 0;">
+                                        <div class="col col-style-sx" data-bss-hover-animate="pulse"><a href="#">
+                                                <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i></div>
+                                            </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger.png?h=e0aa4534da8ccd026056745bbc4a9199"></div>
+                                        <div class="col col-style-dx" data-bss-hover-animate="pulse"><a href="#">
+                                                <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
+                                            </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger%20(1).png?h=fa6df617871770de8ed2775f9ba4ac8f"></div>
+                                    </div>
+                                </div>
+                            ');
+                    }
+                } else{
+                die($mysqli->error . " " . $mysqli->error);
+                }
+            ?>
+
+
             <div class="container Cardsize" style="margin-bottom: 7rem;">
                 <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E78C04;">
                     <div class="col">
@@ -211,6 +231,11 @@
     <script src="../assets/js/aos.min.js?h=d3718e34eeb0355be8e3179a2e2bccb7"></script>
     <script src="../assets/js/bs-init.js?h=67ee20cf4e5150919853fca3720bbf0d"></script>
     <script src="../assets/js/Material-Text-Input.js?h=713af0c6ce93dbbce2f00bf0a98d0541"></script>
+
+<?php else: 
+    header("Location: index.php");    
+ endif; ?>
+
 </body>
 
 </html>

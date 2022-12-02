@@ -35,7 +35,10 @@ $stmt->bind_param("ssssi",
                   $_POST["age"]);
                   
 if ($stmt->execute()) {
-    echo "Signup completed succesfully!";
-} 
+    header("Location: ../WebPages/signupSuccesfully.html");
+    exit;
 
-?>
+} else{
+    die($mysqli->error . " " . $mysqli->error);
+}
+?> 

@@ -1,6 +1,38 @@
 <?php
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+
+    if (isset($_GET['id_post'], $_GET['voted_image'])){
+        $alreadyVoted = "SELECT * FROM vote WHERE ref_user = ? AND id_post = ?";
+
+        $stmt = $mysqli->stmt_init();
+
+        if (! $stmt->prepare($alreadyVoted)) {
+        die("SQL error: " . $mysqli->error);
+        }
+
+        $stmt->bind_param("ii",
+             $_SESSION["user_id"],
+             $_GET["id_post"]);
+                
+        if ($stmt->execute()) {
+            $numVotes = $stmt->rowCount();
+            if ($numVotes == 0) {
+                $setVote = "INSERT INTO vote VALUES(NULL, ?, ?, ?)";
+                $stmt = $mysqli->stmt_init();
+                if (! $stmt->prepare($setVote)) {
+                    die("SQL error: " . $mysqli->error);
+                }
+                $stmt->bind_param("iii",
+                $_SESSION["user_id"],
+                $_GET["id_post"],
+                $_GET["voted_image"]);  
+
+            }
+        } else{
+        die($mysqli->error . " " . $mysqli->error);
+        }
+            }
 ?>
 
 
@@ -49,7 +81,9 @@
         <section style="margin-top: 10rem;">
             <?php
                 
-                $sql = "SELECT p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2 FROM post p, user u1, user u2 WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id";
+                $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2 
+                        FROM post p, user u1, user u2 
+                        WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id";
                 
                 $result = $mysqli->query($sql);
                 
@@ -65,7 +99,7 @@
                                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>75%</strong></p><a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
                                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>25%</strong></p>
                                             <div>
-                                                <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>21 Novembre 2022</em></p>
+                                                <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>'.$data['date'].'</em></p>
                                                 <div class="dropend float-end"><button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;"><i class="far fa-sun"></i></button>
                                                     <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;"><a class="dropdown-item" href="#">Report Post</a><a class="dropdown-item" href="#" style="color: rgb(255,0,0);">Delete post</a></div>
                                                 </div>
@@ -73,12 +107,16 @@
                                         </div>
                                     </div>
                                     <div class="row" style="margin: 0;">
-                                        <div class="col col-style-sx" data-bss-hover-animate="pulse"><a href="#">
+                                        <div class="col col-style-sx" data-bss-hover-animate="pulse">
+                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=0">
                                                 <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i></div>
-                                            </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger.png?h=e0aa4534da8ccd026056745bbc4a9199"></div>
-                                        <div class="col col-style-dx" data-bss-hover-animate="pulse"><a href="#">
+                                            </a>
+                                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'"></div>
+                                        <div class="col col-style-dx" data-bss-hover-animate="pulse">
+                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=1">
                                                 <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
-                                            </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger%20(1).png?h=fa6df617871770de8ed2775f9ba4ac8f"></div>
+                                            </a>
+                                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'"></div>
                                     </div>
                                 </div>
                             ');

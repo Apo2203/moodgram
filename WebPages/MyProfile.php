@@ -19,7 +19,8 @@
 
     /* bind variables to prepared statement */
     $stmt->bind_result($proPic1, $userName, $userSurname, $followers);
-    
+    $stmt->fetch();
+
     //$results = $mysqli->query($sql);
     //$data = $results->fetch_assoc();
 
@@ -59,8 +60,6 @@
     <section>
 
         <?php
-        while($stmt->fetch()){
-
             echo('
                 <div style="width: 98%;padding-bottom: 6rem;margin-bottom: 6rem;background: rgba(49,53,150,0);">
                     <div class="row g-0 text-center" style="margin-top: 3rem;margin-right: 0;margin-left: 0;">
@@ -81,8 +80,7 @@
                     </div>
                 </div>
                 <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>
-            ');
-        }
+            ')
         ?>
         
         <div class="container Cardsize" style="margin-bottom: 7rem;">

@@ -1,12 +1,24 @@
 <?php
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
-
     $sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.email as email
-            FROM user u1";
-    $results = $mysqli->query($sql);
-    $data = $results->fetch_assoc();
-
+            FROM user u1
+            WHERE u1.id = ?";
+    $stmt = $mysqli->stmt_init();
+    
+    if (! $stmt->prepare($sql)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    
+    $stmt->bind_param("i",
+    $_SESSION["user_id"]);
+    
+    $stmt->execute();
+    
+    /* bind variables to prepared statement */
+    $stmt->bind_result($proPic1, $userName, $userSurname, $email);
+    $stmt->fetch();
+    
 ?>
 
 <!DOCTYPE html>
@@ -44,11 +56,11 @@
     <section>
         <?php
         echo('
-            <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$data['userName'].' \'s Setting</span></p>
+            <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$userName.'\'s Setting</span></p>
             <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
                 <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="#" data-bs-target="#modal-2" data-bs-toggle="modal">
                         <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
-                    </a><img class="image-style" src="../assets/img/profilePictureImage/'.$data['proPic1'].'"></div>
+                    </a><img class="image-style" src="../assets/img/profilePictureImage/'.$proPic1.'"></div>
             </div>
             <div class="col-lg-12 d-lg-flex justify-content-lg-center">
                 <div class="card shadow mb-3">
@@ -59,15 +71,15 @@
                         <form>
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="email"><strong>Email Address</strong></label><input class="form-control" type="email" placeholder="'.$data['email'].'" name="email" readonly=""></div>
+                                    <div class="form-group mb-3"><label class="form-label" for="email"><strong>Email Address</strong></label><input class="form-control" type="email" placeholder="'.$email.'" name="email" readonly=""></div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>First Name</strong></label><input class="form-control" type="text" placeholder="'.$data['userName'].'" name="first_name"></div>
+                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>First Name</strong></label><input class="form-control" type="text" placeholder="'.$userName.'" name="first_name"></div>
                                 </div>
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Last Name</strong></label><input class="form-control" type="text" placeholder="'.$data['userSurname'].'" name="last_name"></div>
+                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Last Name</strong></label><input class="form-control" type="text" placeholder="'.$userSurname.'" name="last_name"></div>
                                 </div>
                             </div>
                             <div class="row">
@@ -135,7 +147,12 @@
                 <div class="modal-body">
                     <p>Be careful! You can't go back after your confirmation!</p>
                 </div>
-                <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button><button class="btn btn-danger" type="button">Yes I would like to delete my account</button></div>
+                <?php
+                    echo('
+                        <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                        <a href="accountDelete.php?id='.$_SESSION["user_id"].'"> <button class="btn btn-danger" type="button">Yes I would like to delete my account</button></a></div>
+                    ')
+                ?>
             </div>
         </div>
     </div>

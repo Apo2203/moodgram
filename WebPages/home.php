@@ -2,8 +2,14 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
 
+    //counting of the vote
+
+
+
+
+    //this is the vote part    
     if (isset($_GET['id_post'], $_GET['voted_image'])){
-        $alreadyVoted = "SELECT * FROM vote WHERE ref_user = ? AND id_post = ?";
+        $alreadyVoted = "SELECT * FROM vote WHERE ref_user = ? AND ref_post = ?";
 
         $stmt = $mysqli->stmt_init();
 
@@ -14,19 +20,38 @@
         $stmt->bind_param("ii",
              $_SESSION["user_id"],
              $_GET["id_post"]);
-                
+        
+             
         if ($stmt->execute()) {
-            $numVotes = $stmt->rowCount();
+            $stmt->store_result();
+            $numVotes = $stmt->num_rows;
             if ($numVotes == 0) {
                 $setVote = "INSERT INTO vote VALUES(NULL, ?, ?, ?)";
                 $stmt = $mysqli->stmt_init();
                 if (! $stmt->prepare($setVote)) {
+
                     die("SQL error: " . $mysqli->error);
                 }
                 $stmt->bind_param("iii",
                 $_SESSION["user_id"],
                 $_GET["id_post"],
                 $_GET["voted_image"]);  
+                $stmt->execute();
+            }
+            else{
+                $updateVote = "UPDATE vote SET voted_image = ? WHERE ref_user = ? AND ref_post = ?";
+                $stmt = $mysqli->stmt_init();
+
+                if (! $stmt->prepare($updateVote)) {
+                die("SQL error: " . $mysqli->error);
+                }
+        
+                $stmt->bind_param("iii",
+                    $_GET["voted_image"],
+                    $_SESSION["user_id"],
+                    $_GET["id_post"]);
+                
+                $stmt->execute();
 
             }
         } else{
@@ -84,10 +109,11 @@
         <section style="margin-top: 10rem;">
             <?php
                 
-                $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2 
-                        FROM post p, user u1, user u2 
-                        WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id";
-                
+                $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
+                FROM post p, user u1, user u2
+                WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id
+                GROUP BY p.id_post";                
+                        
                 $result = $mysqli->query($sql);
                 
                 if (TRUE) {
@@ -99,8 +125,8 @@
                                         <div class="col">
                                             <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;"><span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span></p>
                                             <a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>75%</strong></p><a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>25%</strong></p>
+                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg1'].'</strong></p><a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg2'].'</strong></p>
                                             <div>
                                                 <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>'.$data['date'].'</em></p>
                                                 <div class="dropend float-end"><button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;"><i class="far fa-sun"></i></button>

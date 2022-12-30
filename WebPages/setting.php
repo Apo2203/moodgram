@@ -1,3 +1,14 @@
+<?php
+    $mysqli = require __DIR__ . "/../dataBase/database.php";
+    session_start();
+
+    $sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.email as email
+            FROM user u1";
+    $results = $mysqli->query($sql);
+    $data = $results->fetch_assoc();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,55 +36,61 @@
                         <form class="d-sm-flex d-xxl-flex justify-content-sm-center align-items-sm-center justify-content-xxl-center align-items-xxl-center" method="post" action="userList.html"><input type="text" class="search_input" placeholder="Search user..."><button class="btn search-icon" type="submit"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></button></form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="MyProfile.html" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.html" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="MyProfile.php" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>
+
     <section>
-        <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">Francesco's Setting</span></p>
-        <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
-            <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="#" data-bs-target="#modal-2" data-bs-toggle="modal">
-                    <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
-                </a><img class="image-style" src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2"></div>
-        </div>
-        <div class="col-lg-12 d-lg-flex justify-content-lg-center">
-            <div class="card shadow mb-3">
-                <div class="card-header py-3">
-                    <p class="text-primary m-0 fw-bold">User Settings</p>
-                </div>
-                <div class="card-body">
-                    <form>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group mb-3"><label class="form-label" for="email"><strong>Email Address</strong></label><input class="form-control" type="email" placeholder="user@example.com" name="email" readonly=""></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>First Name</strong></label><input class="form-control" type="text" placeholder="Francesco" name="first_name"></div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Last Name</strong></label><input class="form-control" type="text" placeholder="Apollonio" name="last_name"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>New Password</strong><br></label><input class="form-control" type="password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Confirm New Password</strong><br></label><input class="form-control" type="password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
+        <?php
+        echo('
+            <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$data['userName'].' \'s Setting</span></p>
+            <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
+                <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="#" data-bs-target="#modal-2" data-bs-toggle="modal">
+                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
+                    </a><img class="image-style" src="../assets/img/profilePictureImage/'.$data['proPic1'].'"></div>
+            </div>
+            <div class="col-lg-12 d-lg-flex justify-content-lg-center">
+                <div class="card shadow mb-3">
+                    <div class="card-header py-3">
+                        <p class="text-primary m-0 fw-bold">User Settings</p>
+                    </div>
+                    <div class="card-body">
+                        <form>
                             <div class="row">
-                                <div class="col"><button class="btn btn-primary btn-sm" type="submit">Save Settings</button></div>
-                                <div class="col"><button class="btn btn-danger btn-sm" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">DELETE ACCOUNT</button></div>
+                                <div class="col">
+                                    <div class="form-group mb-3"><label class="form-label" for="email"><strong>Email Address</strong></label><input class="form-control" type="email" placeholder="'.$data['email'].'" name="email" readonly=""></div>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>First Name</strong></label><input class="form-control" type="text" placeholder="'.$data['userName'].'" name="first_name"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Last Name</strong></label><input class="form-control" type="text" placeholder="'.$data['userSurname'].'" name="last_name"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>New Password</strong><br></label><input class="form-control" type="password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Confirm New Password</strong><br></label><input class="form-control" type="password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <div class="row">
+                                    <div class="col"><button class="btn btn-primary btn-sm" type="submit">Save Settings</button></div>
+                                    <div class="col"><button class="btn btn-danger btn-sm" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">DELETE ACCOUNT</button></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        ')
+        ?>
+
         <footer class="text-center py-4">
             <div class="container">
                 <div class="row row-cols-1 row-cols-lg-3">

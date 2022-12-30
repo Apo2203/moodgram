@@ -1,7 +1,71 @@
 <?php
+    $isMyPage = FALSE;
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
+
+    $currentIdUserPage = $_GET['id_user'];
+
+    if (isset ($_GET['id_user'])){
+        if($_GET['id_user'] == $_SESSION["user_id"]){
+            $isMyPage = TRUE;
+        }
+    }
+
+    //FOLLOW
+
+    $checkFriendship = "SELECT * FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
+    $alreadyFollow = FALSE;
+    $stmt = $mysqli->stmt_init();
+
+        if (! $stmt->prepare($checkFriendship)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        
+        $stmt->bind_param("ii",
+        $_SESSION["user_id"],
+        $_GET["id_user"]);
+
+        $stmt->execute();
+        $stmt->store_result();
+        $numFollow = $stmt->num_rows;
+
+        if($numFollow == 0){
+            if(isset($_GET["follow"]) && $_GET["follow"] == 'TRUE'){
+                $follow = "INSERT INTO friendship VALUES (?, ?)";
+                $stmt = $mysqli->stmt_init();
+        
+                if (! $stmt->prepare($follow)) {
+                    die("SQL error: " . $mysqli->error);
+                }    
+                
+                $stmt->bind_param("ii",
+                $_SESSION["user_id"],
+                $_GET["id_user"]);
+                $stmt->execute();
+                header("Location: ./Profile.php?id_user=$currentIdUserPage");
+            }
+        }else{
+            $alreadyFollow = TRUE;
+        }
+
+        //REMOVE FOLLOW
+        if(isset($_GET["follow"]) && $_GET["follow"] == 'FALSE'){
+            $removeFollow = "DELETE FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
+
+            $stmt = $mysqli->stmt_init();
+        
+            if (! $stmt->prepare($removeFollow)) {
+                die("SQL error: " . $mysqli->error);
+            }    
+            
+            $stmt->bind_param("ii",
+            $_SESSION["user_id"],
+            $_GET["id_user"]);
+            $stmt->execute();
+            header("Location: ./Profile.php?id_user=$currentIdUserPage");
+        }
 
     $sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.followers AS followers
             FROM user u1
@@ -14,17 +78,13 @@
     }    
     
     $stmt->bind_param("i",
-    $_SESSION["user_id"]);
+    $_GET["id_user"]);
 
     $stmt->execute();
 
     /* bind variables to prepared statement */
     $stmt->bind_result($proPic1, $userName, $userSurname, $followers);
     $stmt->fetch();
-
-    //$results = $mysqli->query($sql);
-    //$data = $results->fetch_assoc();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,35 +116,44 @@
                             <button class="btn search-icon" type="submit"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></button></form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="MyProfile.php" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>
     <section>
 
-        <?php
-            echo('
+        
                 <div style="width: 98%;padding-bottom: 6rem;margin-bottom: 6rem;background: rgba(49,53,150,0);">
                     <div class="row g-0 text-center" style="margin-top: 3rem;margin-right: 0;margin-left: 0;">
-                        <div class="col-12 col-style-sx"><img class="image-style profile-picture" src="../assets/img/profilePictureImage/'.$proPic1.'" style="width: 30%;"></div>
+                    <?php echo(' <div class="col-12 col-style-sx"><img class="image-style profile-picture" src="../assets/img/profilePictureImage/'.$proPic1.'" style="width: 30%;"></div> ')?>
                     </div>
                     <div class="row d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center" style="margin-left: 15%;margin-right: 15%;">
                         <div class="col-12 col-xxl-12 text-center myProfileInformationXS" style="background: #4e95ce;border-radius: 3rem;box-shadow: 0px 0px 9px 0px;margin: 1rem;padding-top: 7px;">
-                            <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$userSurname.'&nbsp;</span><br></p>
-                            <p style="font-family: Poppins, sans-serif;font-size: 20px;"><span style="color: rgb(255, 255, 255);">In a relationship with </span><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a><strong><span style="color: rgb(255, 255, 255);">&nbsp;</span></strong><span style="color: rgb(255, 255, 255);">Tizia Caia</span></p>
-                            <p style="font-size: 20px;"><span style="color: rgb(255, 255, 255);">'.$followers.' follower</span></p>
+                            <?php echo(' <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$userSurname.'&nbsp;</span><br></p> ') ?>
+                            <?php echo(' <p style="font-family: Poppins, sans-serif;font-size: 20px;"><span style="color: rgb(255, 255, 255);">In a relationship with </span><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a><strong><span style="color: rgb(255, 255, 255);">&nbsp;</span></strong><span style="color: rgb(255, 255, 255);">Tizia Caia</span></p>') ?>
+                            <?php echo(' <p style="font-size: 20px;"><span style="color: rgb(255, 255, 255);">'.$followers.' follower</span></p>') ?>
                         </div>
                     </div>
-                    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-4 text-center" style="width: 70%;margin-left: 15%;margin-right: 15%;">
-                        <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div>
-                        <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>
-                        <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>
-                        <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button></div>
-                    </div>
+
+                    <?php
+                        if(! $isMyPage){
+                            
+                                echo(' <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-4 text-center" style="width: 70%;margin-left: 15%;margin-right: 15%;"> ');
+                                if($alreadyFollow == TRUE){
+                                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=FALSE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Unfollow</button></div> ');
+                                }else{
+                                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=TRUE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div> ');
+                                }
+                                echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
+                                echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');
+                                echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button></div></div>');
+                                
+                        }
+                    ?>
                 </div>
-                <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>
-            ')
-        ?>
+                <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>') ?>
+            
+        
         
         <div class="container Cardsize" style="margin-bottom: 7rem;">
             <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #B5B03B;">

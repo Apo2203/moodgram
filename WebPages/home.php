@@ -1,12 +1,6 @@
 <?php
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
-
-    //counting of the vote
-
-
-
-
     //this is the vote part    
     if (isset($_GET['id_post'], $_GET['voted_image'])){
         $alreadyVoted = "SELECT * FROM vote WHERE ref_user = ? AND ref_post = ?";
@@ -92,7 +86,7 @@
                         </form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="MyProfile.php" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>
@@ -111,7 +105,7 @@
                 
                 $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
                 FROM post p, user u1, user u2
-                WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id
+                WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1, friendship f WHERE f.ref_user_1 = ".$_SESSION["user_id"]." AND (p1.ref_user1 = f.ref_user_2 OR p1.ref_user2 = f.ref_user_2))
                 GROUP BY p.id_post";                
                         
                 $result = $mysqli->query($sql);

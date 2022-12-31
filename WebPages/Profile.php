@@ -2,19 +2,33 @@
     $isMyPage = FALSE;
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
-
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
-
-    $currentIdUserPage = $_GET['id_user'];
-
+    
     if (isset ($_GET['id_user'])){
+        $currentIdUserPage = $_GET['id_user'];
+
+        //Check if the ID exist
+        $idExist = "SELECT `id` FROM user WHERE id = ?";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($idExist)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        
+        $stmt->bind_param("i", $currentIdUserPage);
+        $stmt->execute();
+        $stmt->store_result();
+
+
+        if($stmt->num_rows != 1){
+            header("Location: ./userNotExist.php");
+        }
+
         if($_GET['id_user'] == $_SESSION["user_id"]){
             $isMyPage = TRUE;
         }
     }
 
     //FOLLOW
-
     $checkFriendship = "SELECT * FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
     $alreadyFollow = FALSE;
     $stmt = $mysqli->stmt_init();
@@ -123,38 +137,36 @@
     <section>
 
         
-                <div style="width: 98%;padding-bottom: 6rem;margin-bottom: 6rem;background: rgba(49,53,150,0);">
-                    <div class="row g-0 text-center" style="margin-top: 3rem;margin-right: 0;margin-left: 0;">
-                    <?php echo(' <div class="col-12 col-style-sx"><img class="image-style profile-picture" src="../assets/img/profilePictureImage/'.$proPic1.'" style="width: 30%;"></div> ')?>
-                    </div>
-                    <div class="row d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center" style="margin-left: 15%;margin-right: 15%;">
-                        <div class="col-12 col-xxl-12 text-center myProfileInformationXS" style="background: #4e95ce;border-radius: 3rem;box-shadow: 0px 0px 9px 0px;margin: 1rem;padding-top: 7px;">
-                            <?php echo(' <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$userSurname.'&nbsp;</span><br></p> ') ?>
-                            <?php echo(' <p style="font-family: Poppins, sans-serif;font-size: 20px;"><span style="color: rgb(255, 255, 255);">In a relationship with </span><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a><strong><span style="color: rgb(255, 255, 255);">&nbsp;</span></strong><span style="color: rgb(255, 255, 255);">Tizia Caia</span></p>') ?>
-                            <?php echo(' <p style="font-size: 20px;"><span style="color: rgb(255, 255, 255);">'.$followers.' follower</span></p>') ?>
-                        </div>
-                    </div>
-
-                    <?php
-                        if(! $isMyPage){
-                            
-                                echo(' <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-4 text-center" style="width: 70%;margin-left: 15%;margin-right: 15%;"> ');
-                                if($alreadyFollow == TRUE){
-                                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=FALSE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Unfollow</button></div> ');
-                                }else{
-                                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=TRUE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div> ');
-                                }
-                                echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
-                                echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');
-                                echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button></div></div>');
-                                
-                        }
-                    ?>
+        <div style="width: 98%;padding-bottom: 6rem;margin-bottom: 6rem;background: rgba(49,53,150,0);">
+            <div class="row g-0 text-center" style="margin-top: 3rem;margin-right: 0;margin-left: 0;">
+            <?php echo(' <div class="col-12 col-style-sx"><img class="image-style profile-picture" src="../assets/img/profilePictureImage/'.$proPic1.'" style="width: 30%;"></div> ')?>
+            </div>
+            <div class="row d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center" style="margin-left: 15%;margin-right: 15%;">
+                <div class="col-12 col-xxl-12 text-center myProfileInformationXS" style="background: #4e95ce;border-radius: 3rem;box-shadow: 0px 0px 9px 0px;margin: 1rem;padding-top: 7px;">
+                    <?php echo(' <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$userSurname.'&nbsp;</span><br></p> ') ?>
+                    <?php echo(' <p style="font-family: Poppins, sans-serif;font-size: 20px;"><span style="color: rgb(255, 255, 255);">In a relationship with </span><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a><strong><span style="color: rgb(255, 255, 255);">&nbsp;</span></strong><span style="color: rgb(255, 255, 255);">Tizia Caia</span></p>') ?>
+                    <?php echo(' <p style="font-size: 20px;"><span style="color: rgb(255, 255, 255);">'.$followers.' follower</span></p>') ?>
                 </div>
-                <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>') ?>
-            
-        
-        
+        </div>
+
+        <?php
+            if(! $isMyPage){
+                
+                    echo(' <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-4 text-center" style="width: 70%;margin-left: 15%;margin-right: 15%;"> ');
+                    if($alreadyFollow == TRUE){
+                        echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=FALSE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Unfollow</button></div> ');
+                    }else{
+                        echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=TRUE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div> ');
+                    }
+                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
+                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');
+                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button></div></div>');
+                    
+            }
+        ?>
+        </div>
+        <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>') ?>
+
         <div class="container Cardsize" style="margin-bottom: 7rem;">
             <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #B5B03B;">
                 <div class="col">

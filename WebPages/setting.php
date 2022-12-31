@@ -58,13 +58,12 @@
     </nav>
 
     <section>
-        <?php
-        echo('
-            <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$userName.'\'s Setting</span></p>
+
+            <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$userName.'\'s Setting</span></p> ') ?>
             <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
                 <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="#" data-bs-target="#modal-2" data-bs-toggle="modal">
                         <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
-                    </a><img class="image-style" src="../assets/img/profilePictureImage/'.$proPic1.'"></div>
+                        <?php echo(' </a><img class="image-style" src="../assets/img/profilePictureImage/'.$proPic1.'"></div> ') ?>
             </div>
             <div class="col-lg-12 d-lg-flex justify-content-lg-center">
                 <div class="card shadow mb-3">
@@ -72,26 +71,26 @@
                         <p class="text-primary m-0 fw-bold">User Settings</p>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <form action="../dataBase/updateInformation.php" method="post"> 
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="email"><strong>Email Address</strong></label><input class="form-control" type="email" placeholder="'.$email.'" name="email" readonly=""></div>
+                                <?php echo(' <div class="form-group mb-3"><label class="form-label" for="email"><strong>Email Address</strong></label><input class="form-control" type="email" placeholder="'.$email.'" name="email" readonly=""></div>') ?>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>First Name</strong></label><input class="form-control" type="text" placeholder="'.$userName.'" name="first_name"></div>
+                                <?php echo(' <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>First Name</strong></label><input class="form-control" type="text" placeholder="'.$userName.'" name="name"></div> ') ?>
                                 </div>
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Last Name</strong></label><input class="form-control" type="text" placeholder="'.$userSurname.'" name="last_name"></div>
+                                <?php echo(' <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Last Name</strong></label><input class="form-control" type="text" placeholder="'.$userSurname.'" name="surname"></div> ') ?>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>New Password</strong><br></label><input class="form-control" type="password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
+                                    <div class="form-group mb-3"><label class="form-label" for="first_name"><strong>New Password</strong><br></label><input class="form-control" type="password"  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" name="password"></div>
                                 </div>
                                 <div class="col">
-                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Confirm New Password</strong><br></label><input class="form-control" type="password" required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></div>
+                                    <div class="form-group mb-3"><label class="form-label" for="last_name"><strong>Confirm New Password</strong><br></label><input class="form-control" type="password"  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" name="passwordConfirm"></div>
                                 </div>
                             </div>
                             <div class="form-group mb-3">
@@ -104,8 +103,6 @@
                     </div>
                 </div>
             </div>
-        ')
-        ?>
 
         <footer class="text-center py-4">
             <div class="container">

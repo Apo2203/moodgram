@@ -61,9 +61,9 @@
 
             <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$userName.'\'s Setting</span></p> ') ?>
             <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
-                <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="#" data-bs-target="#modal-2" data-bs-toggle="modal">
-                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
-                        <?php echo(' </a><img class="image-style" src="../assets/img/profilePictureImage/'.$proPic1.'"></div> ') ?>
+                <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="" data-bs-target="#modal-2" data-bs-toggle="modal">
+                    <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
+                    <?php echo(' </a><img class="image-style" src="../assets/img/profilePictureImage/'.$proPic1.'"></div> ') ?>
             </div>
             <div class="col-lg-12 d-lg-flex justify-content-lg-center">
                 <div class="card shadow mb-3">
@@ -164,7 +164,11 @@
                     <h4 class="modal-title">Choose your new profile picture and confirm.</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form><input class="form-control" type="file" accept="image/*" required=""><button class="btn btn-primary float-end" type="submit" style="margin-top: 12px;">Save</button></form><button class="btn btn-secondary" type="button" data-bs-dismiss="modal" style="margin-top: 12px;">Close</button>
+                    <form action="../dataBase/loadNewImage.php" method="post" enctype="multipart/form-data">
+                        <input class="form-control" type="file" name="newImage" accept="image/*" required="">
+                        <button class="btn btn-primary float-end" type="submit" name="submit" value="upload" style="margin-top: 12px;">Save</button>
+                    </form>
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal" style="margin-top: 12px;">Close</button>
                 </div>
                 <div class="modal-footer"></div>
             </div>

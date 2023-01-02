@@ -111,10 +111,12 @@
                     while ($data = $result->fetch_assoc())
                     {
                         echo('
-                                <div class="container Cardsize" style="margin-bottom: 7rem;">
+                                <div class="container Cardsize" id="pos'.$data['id_post'].'" style="margin-bottom: 7rem;">
                                     <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
                                         <div class="col">
-                                            <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;"><span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span></p>
+                                            <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
+                                                <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
+                                            </p>
                                             <a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
                                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg1'].'</strong></p><a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
                                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg2'].'</strong></p>
@@ -128,13 +130,13 @@
                                     </div>
                                     <div class="row" style="margin: 0;">
                                         <div class="col col-style-sx" data-bss-hover-animate="pulse">
-                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=0">
+                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=0#pos'.$data['id_post'].'">
                                                 <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i></div>
                                             </a>
                                             <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'"></div>
-                                        <div class="col col-style-dx" data-bss-hover-animate="pulse">
-                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=1">
-                                                <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
+                                        <div class="col col-style-dx" data-bss-hover-animate="pulse"> 
+                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=1#pos'.$data['id_post'].'">
+                                            <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
                                             </a>
                                             <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'"></div>
                                     </div>

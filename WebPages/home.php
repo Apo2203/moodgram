@@ -100,7 +100,7 @@
         <section style="margin-top: 10rem;">
             <?php
                 
-                $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
+                $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.id as id1, u2.id as id2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
                 FROM post p, user u1, user u2
                 WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1, friendship f WHERE f.ref_user_1 = ".$_SESSION["user_id"]." AND (p1.ref_user1 = f.ref_user_2 OR p1.ref_user2 = f.ref_user_2))
                 GROUP BY p.id_post";                
@@ -117,8 +117,9 @@
                                             <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
                                                 <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
                                             </p>
-                                            <a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg1'].'</strong></p><a href="#"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                            <a href="Profile.php?id_user='.$data['id1'].'/"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg1'].'</strong></p>
+                                            <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
                                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg2'].'</strong></p>
                                             <div>
                                                 <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>'.$data['date'].'</em></p>

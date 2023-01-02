@@ -3,7 +3,7 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
-    
+
     if (isset ($_GET['id_user'])){
         $currentIdUserPage = $_GET['id_user'];
 
@@ -26,6 +26,21 @@
         if($_GET['id_user'] == $_SESSION["user_id"]){
             $isMyPage = TRUE;
         }
+
+        //Check the actual number of follower
+        $getFollower = "SELECT followers FROM user WHERE id = ?";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($getFollower)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        
+        $stmt->bind_param("i", $currentIdUserPage);
+        $stmt->execute();
+        $array = [];
+        foreach ($stmt->get_result() as $row){
+            $array[] = $row['followers'];
+        }
+        $actualFollower = $array[0];
     }
 
     //FOLLOW
@@ -58,6 +73,19 @@
                 $_SESSION["user_id"],
                 $_GET["id_user"]);
                 $stmt->execute();
+
+                //Update followers on database
+                $getFollower = "UPDATE user SET followers = ? WHERE id = ?";
+                $stmt = $mysqli->stmt_init();
+                if (! $stmt->prepare($getFollower)) {
+                    die("SQL error: " . $mysqli->error);
+                }    
+                
+                $actualFollower = ($actualFollower + 1);
+                $stmt->bind_param("ii",
+                ($actualFollower),
+                $currentIdUserPage);
+                $stmt->execute();
                 header("Location: ./Profile.php?id_user=$currentIdUserPage");
             }
         }else{
@@ -78,6 +106,20 @@
             $_SESSION["user_id"],
             $_GET["id_user"]);
             $stmt->execute();
+
+            //Update followers on database
+            $getFollower = "UPDATE user SET followers = ? WHERE id = ?";
+            $stmt = $mysqli->stmt_init();
+            if (! $stmt->prepare($getFollower)) {
+                die("SQL error: " . $mysqli->error);
+            }    
+            
+            $actualFollower = ($actualFollower - 1);
+            $stmt->bind_param("ii",
+            ($actualFollower),
+            $currentIdUserPage);
+            $stmt->execute();
+            
             header("Location: ./Profile.php?id_user=$currentIdUserPage");
         }
 
@@ -160,7 +202,8 @@
                     }
                     echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
                     echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');
-                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button></div></div>');
+                    //echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button>');
+                    echo (' </div></div> ');
                     
             }
         ?>

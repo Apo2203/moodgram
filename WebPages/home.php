@@ -255,10 +255,10 @@
                             <div class="modal-header">
                                 <h4 class="modal-title">You got a relationship request!</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body"><a href="#"></a>
+                            <div class="modal-body">
                                 <p style="margin-top: 1rem;font-size: 20px;">
-                                    <img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 3rem;border-radius: 3rem;">
-                                    '.$userName.' '.$UserSurname.' sent you a relationship request, would you like to accept?
+                                <a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 3rem; border-radius: 3rem;"></a>
+                                     '.$userName.' '.$UserSurname.' sent you a relationship request, would you like to accept?
                                 </p>
                             </div>
                             <div class="modal-footer"><button class="btn btn-danger" onclick="window.location.href=\'home.php?rejectRelationFrom='.$id.'\';" type="button" data-bs-dismiss="modal">Reject</button>

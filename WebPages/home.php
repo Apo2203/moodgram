@@ -2,6 +2,7 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
 
+    //Accept relationship
     if (isset($_GET['acceptRelationFrom'])){
         $acceptRelation = "UPDATE relationship set confirmed = 1 WHERE ref_user_1 = ? AND ref_user_2 = ?";
         $stmt = $mysqli->stmt_init();
@@ -11,6 +12,21 @@
         $stmt->bind_param("ii",
             $_GET["acceptRelationFrom"],
             $_SESSION["user_id"]
+        );
+        $stmt->execute();
+        header("Location: home.php");
+    }
+
+    //Reject relationship
+    if (isset($_GET['rejectRelationFrom'])){
+        $rejecttRelation = "DELETE FROM `relationship` WHERE `relationship`.`ref_user_2` = ? AND `relationship`.`ref_user_1` = ?";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($rejecttRelation)) {
+        die("SQL error: " . $mysqli->error);
+        }
+        $stmt->bind_param("ii",
+            $_SESSION["user_id"],
+            $_GET["rejectRelationFrom"]
         );
         $stmt->execute();
         header("Location: home.php");
@@ -107,7 +123,10 @@
                 <div class="shadow d-flex flex-column justify-content-center align-items-center backgroundContent" data-bss-hover-animate="pulse" style="background: url(&quot;../assets/img/emojibackground.png?h=2a5cd7d3a9c31ae0d60e9c7bac9d2531&quot;) center / cover no-repeat;">
                     <h1 class="display-1 fs-1 fw-bold text-center" style="color: rgb(255,255,255);letter-spacing: 4px;line-height: 48px;font-family: Aboreto, serif;">Welcome back...</h1>
                     <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Write here your today's status</p>
-                    <form class="text-center" method="post"><input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;"><button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button></form>
+                    <form class="text-center" method="post" action="../textToImageAI/test.php">
+                        <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
+                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -242,7 +261,7 @@
                                     '.$userName.' '.$UserSurname.' sent you a relationship request, would you like to accept?
                                 </p>
                             </div>
-                            <div class="modal-footer"><button class="btn btn-danger" type="button" data-bs-dismiss="modal">Reject</button>
+                            <div class="modal-footer"><button class="btn btn-danger" onclick="window.location.href=\'home.php?rejectRelationFrom='.$id.'\';" type="button" data-bs-dismiss="modal">Reject</button>
                             <button class="btn btn-success" onclick="window.location.href=\'home.php?acceptRelationFrom='.$id.'\';" type="button">Accept</button></div>
                         </div>
                     </div>

@@ -4,7 +4,7 @@ API_KEY = "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"
 openai.api_key = API_KEY
 inputText = str(sys.argv[1]) #text I'll use to generate the image
 
-if(len(sys.argv) != 2):
+if(len(sys.argv) != 3):
     print("Error getting the input for image generation: check parameter")
     sys.exit()
 
@@ -19,6 +19,10 @@ except openai.error.OpenAIError as e:
     print(e.http_status)
     print(e.error)
 
-print(image_url)
+#print(image_url)
+
+f = open("/var/www/html/moodgram/textToImageAI/tmp" + str(sys.argv[2]), "w+")
+f.write(image_url)
+f.close()
 
 # to run this code from a php file look the example in "test.php"

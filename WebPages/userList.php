@@ -40,56 +40,7 @@
     </nav>
     <section>
         <p class="text-center" style="font-family: Poppins, sans-serif;font-size: 2rem;margin-top: 2rem;color: var(--bs-gray-100);margin-bottom: 5rem;">Here is your results for 'Francesco Apollonio'</p>
-        <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
-            <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>
-                <div class="col-auto">
-                    <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">Francesco Apollonio&nbsp;</span><br></p>
-                    <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                    <p>275 follower</p>
-                </div>
-            </div>
-        </div>
-        <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
-            <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>
-                <div class="col-auto">
-                    <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">Francesco Apollonio&nbsp;</span><br></p>
-                    <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                    <p>275 follower</p>
-                </div>
-            </div>
-        </div>
-        <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
-            <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>
-                <div class="col-auto">
-                    <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">Francesco Apollonio&nbsp;</span><br></p>
-                    <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                    <p>275 follower</p>
-                </div>
-            </div>
-        </div>
-        <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
-            <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>
-                <div class="col-auto">
-                    <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">Francesco Apollonio&nbsp;</span><br></p>
-                    <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                    <p>275 follower</p>
-                </div>
-            </div>
-        </div>
-        <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
-            <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>
-                <div class="col-auto">
-                    <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">Francesco Apollonio&nbsp;</span><br></p>
-                    <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                    <p>275 follower</p>
-                </div>
-            </div>
-        </div>
+        
         <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
             <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
                 <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>

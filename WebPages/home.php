@@ -2,6 +2,20 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
 
+    if (isset($_GET['acceptRelationFrom'])){
+        $acceptRelation = "UPDATE relationship set confirmed = 1 WHERE ref_user_1 = ? AND ref_user_2 = ?";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($acceptRelation)) {
+        die("SQL error: " . $mysqli->error);
+        }
+        $stmt->bind_param("ii",
+            $_GET["acceptRelationFrom"],
+            $_SESSION["user_id"]
+        );
+        $stmt->execute();
+        header("Location: home.php");
+    }
+
     //Voting post    
     if (isset($_GET['id_post'], $_GET['voted_image'])){
         $alreadyVoted = "SELECT * FROM vote WHERE ref_user = ? AND ref_post = ?";
@@ -192,19 +206,54 @@
             </div>
         </footer>
     </section>
-    <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">You got a relationship request!</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+    <!-- VIEW REQUEST RELATIONSHIP-->
+    <?php 
+    
+        //CHECK RELATIONSHIP REQUEST
+        $sql = "SELECT u.profilePicture as proPic, u.name as userName, u.surname as userSurname, u.id as id FROM user u, relationship r WHERE r.ref_user_1 = u.id AND r.ref_user_2 = ? AND r.confirmed = 0";
+        
+        $stmt = $mysqli->stmt_init();
+        
+        if (! $stmt->prepare($sql)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        $stmt->bind_param("i",
+        $_SESSION["user_id"]);
+        $stmt->execute();
+        $stmt->store_result();
+        $rows = $stmt->num_rows;
+
+        if($rows != 0){
+            //REQUEST FOUNDED
+            /* bind variables to prepared statement */
+            $stmt->bind_result($proPic, $userName, $UserSurname, $id);
+            $stmt->fetch();
+            echo('
+                <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">You got a relationship request!</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body"><a href="#"></a>
+                                <p style="margin-top: 1rem;font-size: 20px;">
+                                    <img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 3rem;border-radius: 3rem;">
+                                    '.$userName.' '.$UserSurname.' sent you a relationship request, would you like to accept?
+                                </p>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-danger" type="button" data-bs-dismiss="modal">Reject</button>
+                            <button class="btn btn-success" onclick="window.location.href=\'home.php?acceptRelationFrom='.$id.'\';" type="button">Accept</button></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body"><a href="#"></a>
-                    <p style="margin-top: 1rem;font-size: 20px;"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;">Tizia Caia sent you a relationship request, would you like to accept?</p>
-                </div>
-                <div class="modal-footer"><button class="btn btn-danger" type="button" data-bs-dismiss="modal">Reject</button><button class="btn btn-success" type="button">Accept</button></div>
-            </div>
-        </div>
-    </div>
+            ');
+        }
+    
+    ?>
+    
+    <!-- END -->
+
     <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -218,10 +267,23 @@
             </div>
         </div>
     </div>
+    
     <script src="../assets/bootstrap/js/bootstrap.min.js?h=981245863c383366a329259d02b8172c"></script>
     <script src="../assets/js/aos.min.js?h=d3718e34eeb0355be8e3179a2e2bccb7"></script>
     <script src="../assets/js/bs-init.js?h=67ee20cf4e5150919853fca3720bbf0d"></script>
     <script src="../assets/js/Material-Text-Input.js?h=713af0c6ce93dbbce2f00bf0a98d0541"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            OpenBootstrapPopup();
+        };
+        function OpenBootstrapPopup() {
+            $("#modal-1").modal('show');
+        }
+    </script>
+
+
 
     <?php 
             else: 

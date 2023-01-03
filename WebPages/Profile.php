@@ -2,6 +2,8 @@
     $isMyPage = FALSE;
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+    $alreadyRelationship = FALSE;
+
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
 
     if (isset ($_GET['id_user'])){
@@ -42,6 +44,47 @@
         }
         $actualFollower = $array[0];
     }
+
+
+
+    //ASK RELATIONSHIP
+    $checkRelationship = "SELECT * FROM relationship WHERE (ref_user_1 = ? AND ref_user_2 = ?) OR (ref_user_2 = ? AND ref_user_1 = ?)";
+    
+    $stmt = $mysqli->stmt_init();
+    
+    if (! $stmt->prepare($checkRelationship)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt->bind_param("iiii",
+    $_SESSION["user_id"],
+    $_GET["id_user"],
+    $_SESSION["user_id"],
+    $_GET["id_user"]
+    );
+
+    $stmt->execute();
+    $stmt->store_result();
+    $numRelationship = $stmt->num_rows;
+
+
+if($numRelationship == 0){
+    if (isset($_GET['askRelationship']) && $_GET['askRelationship'] == "TRUE"){
+            $sql = "INSERT INTO `relationship` (`ref_user_1`, `ref_user_2`, `confirmed`) VALUES (?, ?, '0');";
+            $stmt = $mysqli->stmt_init();
+
+            if (! $stmt->prepare($sql)) {
+                die("SQL error: " . $mysqli->error);
+            }    
+            $stmt->bind_param("ii",
+            $_SESSION["user_id"],
+            $_GET["id_user"]
+            );
+            $stmt->execute();
+    }
+    else{
+        $alreadyRelationship = TRUE;
+    }
+}
 
     //FOLLOW
     $checkFriendship = "SELECT * FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
@@ -200,7 +243,9 @@
                     }else{
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=TRUE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div> ');
                     }
-                    echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
+                    if($alreadyRelationship == "FALSE"){
+                        echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&askRelationship=TRUE\';" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
+                    }
                     echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');
                     //echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button>');
                     echo (' </div></div> ');

@@ -10,7 +10,7 @@ if (isset($_POST["submit"]) && isset($_FILES["newImage"])){
     $error = $_FILES["newImage"]["error"];
 
     if ($error == 0){
-        if($img_size > 225000){
+        if($img_size > 925000){
             echo ("Sorry, your file is too big");
         }
         else{

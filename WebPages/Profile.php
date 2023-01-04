@@ -46,6 +46,24 @@
         $actualFollower = $array[0];
     }
 
+    //Check if a user is already in a relationship
+    $sql = "SELECT * FROM relationship WHERE ref_user_1 = ? OR ref_user_2 = ? OR ref_user_1 = ? OR ref_user_2 = ? AND confirmed = 1";
+    $stmt = $mysqli->stmt_init();
+    if (! $stmt->prepare($sql)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt->bind_param("iiii",
+    $currentIdUserPage,
+    $currentIdUserPage,
+    $_SESSION["user_id"],
+    $_SESSION["user_id"]
+    );
+
+    $stmt->execute();
+    $stmt->store_result();
+    if($stmt->num_rows > 0){
+        $alreadyRelationship = TRUE;
+    } 
 
 
     //ASK RELATIONSHIP
@@ -81,10 +99,8 @@ if($numRelationship == 0){
             $_GET["id_user"]
             );
             $stmt->execute();
-    }
-    else{
-        $alreadyRelationship = TRUE;
-    }
+            header("Location: ./Profile.php?id_user=$currentIdUserPage");
+        }
 }
 
     //FOLLOW
@@ -266,7 +282,7 @@ if($numRelationship == 0){
                     }else{
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=TRUE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div> ');
                     }
-                    if($alreadyRelationship == "FALSE"){
+                    if($alreadyRelationship == FALSE){
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&askRelationship=TRUE\';" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
                     }
                     echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');

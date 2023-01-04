@@ -15,7 +15,8 @@
             $_SESSION["user_id"]
         );
         $stmt->execute();
-        header("Location: home.php");
+        // If I accept a relationship I will automatically start following my partner
+        header("Location: ./Profile.php?id_user=".$_GET["acceptRelationFrom"]."&follow=TRUE");
     }
 
     // Reject relationship request

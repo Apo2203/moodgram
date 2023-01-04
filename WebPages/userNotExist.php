@@ -1,8 +1,9 @@
 <?php
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+    // Check to avoid some cybersecurity attack
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
-?>
+    if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");?>
 <!DOCTYPE html>
 <html lang="en">
 

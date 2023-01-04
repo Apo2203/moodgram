@@ -1,13 +1,15 @@
 <?php
-    $isMyPage = FALSE;
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+    $isMyPage = FALSE;
     $alreadyRelationship = FALSE;
     $isAdmin = FALSE;
 
+    // Check to avoid some cybersecurity attack
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
+    if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");
 
-    if (isset ($_GET['id_user'])){
+        if (isset ($_GET['id_user'])){
         $currentIdUserPage = $_GET['id_user'];
 
         //Check if the ID exist
@@ -47,7 +49,7 @@
     }
 
     //Check if a user is already in a relationship
-    $sql = "SELECT * FROM relationship WHERE ref_user_1 = ? OR ref_user_2 = ? OR ref_user_1 = ? OR ref_user_2 = ? AND confirmed = 1";
+    $sql = "SELECT * FROM relationship WHERE (ref_user_1 = ? OR ref_user_2 = ? OR ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
     $stmt = $mysqli->stmt_init();
     if (! $stmt->prepare($sql)) {
         die("SQL error: " . $mysqli->error);
@@ -274,8 +276,7 @@ if($numRelationship == 0){
         </div>
 
         <?php
-            if(! $isMyPage){
-                
+            if(!$isMyPage){
                     echo(' <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-4 text-center" style="width: 70%;margin-left: 15%;margin-right: 15%;"> ');
                     if($alreadyFollow == TRUE){
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=FALSE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Unfollow</button></div> ');

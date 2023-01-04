@@ -2,7 +2,7 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
 
-    //Accept relationship
+    // Accept relationship request
     if (isset($_GET['acceptRelationFrom'])){
         $acceptRelation = "UPDATE relationship set confirmed = 1 WHERE ref_user_1 = ? AND ref_user_2 = ?";
         $stmt = $mysqli->stmt_init();
@@ -17,7 +17,7 @@
         header("Location: home.php");
     }
 
-    //Reject relationship
+    // Reject relationship request
     if (isset($_GET['rejectRelationFrom'])){
         $rejecttRelation = "DELETE FROM `relationship` WHERE `relationship`.`ref_user_2` = ? AND `relationship`.`ref_user_1` = ?";
         $stmt = $mysqli->stmt_init();
@@ -32,7 +32,7 @@
         header("Location: home.php");
     }
 
-    //Voting post    
+    // Voting image in a post    
     if (isset($_GET['id_post'], $_GET['voted_image'])){
         $alreadyVoted = "SELECT * FROM vote WHERE ref_user = ? AND ref_post = ?";
         $stmt = $mysqli->stmt_init();

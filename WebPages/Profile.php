@@ -3,6 +3,7 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
     $alreadyRelationship = FALSE;
+    $isAdmin = FALSE;
 
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
 
@@ -165,25 +166,47 @@ if($numRelationship == 0){
             
             header("Location: ./Profile.php?id_user=$currentIdUserPage");
         }
-
     $sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.followers AS followers
             FROM user u1
             WHERE u1.id = ?";
-
     $stmt = $mysqli->stmt_init();
-
     if (! $stmt->prepare($sql)) {
         die("SQL error: " . $mysqli->error);
     }    
-    
     $stmt->bind_param("i",
     $_GET["id_user"]);
-
     $stmt->execute();
-
     /* bind variables to prepared statement */
     $stmt->bind_result($proPic1, $userName, $userSurname, $followers);
     $stmt->fetch();
+
+    // Check if the current user is an administrator
+    $sql = "SELECT * FROM user WHERE id = ? AND role = 'admin'";
+    $stmt = $mysqli->stmt_init();
+    if (! $stmt->prepare($sql)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt->bind_param("i", $_SESSION["user_id"]);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows == 1) $isAdmin = TRUE;
+
+    // Ban an account
+    if(isset($_GET["banUser"])){
+        if($isAdmin == TRUE && (! $_GET["banUser"] == $_SESSION["user_id"])){
+            $sql = "DELETE FROM `user` WHERE id = ?";
+            $stmt = $mysqli->stmt_init();
+            if (! $stmt->prepare($sql)) {
+                die("SQL error: " . $mysqli->error);
+            }    
+            $stmt->bind_param("i", $_GET["banUser"]);
+            $stmt->execute();
+            header("Location: ./home.php");
+        }else{
+            session_destroy();
+            header("Location: ./index.php");
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -247,7 +270,9 @@ if($numRelationship == 0){
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&askRelationship=TRUE\';" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
                     }
                     echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');
-                    //echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button>');
+                    if($isAdmin == "TRUE"){
+                        echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-danger btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?banUser='.$currentIdUserPage.'\'" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ban</button>');
+                    }
                     echo (' </div></div> ');
                     
             }

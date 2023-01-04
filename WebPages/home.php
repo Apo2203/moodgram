@@ -1,6 +1,7 @@
 <?php
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+    $isAdmin = FALSE;
 
     // Accept relationship request
     if (isset($_GET['acceptRelationFrom'])){
@@ -79,6 +80,34 @@
         die($mysqli->error . " " . $mysqli->error);
         }
     }
+
+    // Check if the current user is an administrator
+    $sql = "SELECT * FROM user WHERE id = ? AND role = 'admin'";
+    $stmt = $mysqli->stmt_init();
+    if (! $stmt->prepare($sql)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt->bind_param("i", $_SESSION["user_id"]);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows == 1) $isAdmin = TRUE;
+
+    // Delete a post
+    if(isset($_GET["deletePost"])){
+        if($isAdmin == TRUE){
+            $sql = "DELETE FROM `post` WHERE `post`.`id_post` = ?";
+            $stmt = $mysqli->stmt_init();
+            if (! $stmt->prepare($sql)) {
+                die("SQL error: " . $mysqli->error);
+            }    
+            $stmt->bind_param("i", $_GET["deletePost"]);
+            $stmt->execute();
+            header("Location: ./home.php");
+        }else{
+            session_destroy();
+            header("Location: ./index.php");
+        }
+    }
 ?>
 
 
@@ -144,38 +173,73 @@
                     while ($data = $result->fetch_assoc())
                     {
                         echo('
-                                <div class="container Cardsize" id="pos'.$data['id_post'].'" style="margin-bottom: 7rem;">
-                                    <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
-                                        <div class="col">
-                                            <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
-                                                <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
+                            <div class="container Cardsize" id="pos'.$data['id_post'].'" style="margin-bottom: 7rem;">
+                                <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
+                                    <div class="col">
+                                        <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
+                                            <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
+                                        </p>
+                                        <a href="Profile.php?id_user='.$data['id1'].'/">
+                                            <img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;">
+                                        </a>
+                                        <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
+                                            <strong>'.$data['voteImg1'].'</strong>
+                                        </p>
+                                        <a href="Profile.php?id_user='.$data['id2'].'">
+                                            <img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;">
+                                        </a>
+                                        <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
+                                            <strong>'.$data['voteImg2'].'</strong>
+                                        </p>
+                                        <div>
+                                            <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;">
+                                                <em>'.$data['date'].'</em>
                                             </p>
-                                            <a href="Profile.php?id_user='.$data['id1'].'/"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg1'].'</strong></p>
-                                            <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;"><strong>'.$data['voteImg2'].'</strong></p>
-                                            <div>
-                                                <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;"><em>'.$data['date'].'</em></p>
-                                                <div class="dropend float-end"><button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;"><i class="far fa-sun"></i></button>
-                                                    <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;"><a class="dropdown-item" href="#">Report Post</a><a class="dropdown-item" href="#" style="color: rgb(255,0,0);">Delete post</a></div>
-                                                </div>
+                                            <div class="dropend float-end">
+                                                <button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;">
+                                                    <i class="far fa-sun"></i>
+                                                </button>
+                                                ');
+                                                if ($isAdmin == "TRUE"){
+                                                    echo('
+                                                        <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
+                                                            <a class="dropdown-item" href="#">Report Post</a>
+                                                            <a class="dropdown-item" href="./home.php?deletePost='.$data["id_post"].'" style="color: rgb(255,0,0);">Delete post</a>
+                                                        </div>
+                                                    ');
+                                                }
+                                                else{
+                                                    echo('
+                                                        <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
+                                                            <a class="dropdown-item" href="#">Report Post</a>
+                                                        </div>
+                                                    ');
+                                                }
+                                                echo('
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row" style="margin: 0;">
-                                        <div class="col col-style-sx" data-bss-hover-animate="pulse">
-                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=0#pos'.$data['id_post'].'">
-                                                <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i></div>
-                                            </a>
-                                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'"></div>
-                                        <div class="col col-style-dx" data-bss-hover-animate="pulse"> 
-                                            <a href="home.php?id_post='.$data['id_post'].'&voted_image=1#pos'.$data['id_post'].'">
-                                            <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
-                                            </a>
-                                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'"></div>
+                                </div>
+                                <div class="row" style="margin: 0;">
+                                    <div class="col col-style-sx" data-bss-hover-animate="pulse">
+                                        <a href="home.php?id_post='.$data['id_post'].'&voted_image=0#pos'.$data['id_post'].'">
+                                            <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
+                                                <i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i>
+                                            </div>
+                                        </a>
+                                        <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'">
+                                    </div>
+                                    <div class="col col-style-dx" data-bss-hover-animate="pulse">
+                                        <a href="home.php?id_post='.$data['id_post'].'&voted_image=1#pos'.$data['id_post'].'">
+                                            <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
+                                                <i class="fas fa-heart"></i>
+                                            </div>
+                                        </a>
+                                        <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'">
                                     </div>
                                 </div>
-                            ');
+                            </div>
+                        ');
                     }
                 } else{
                 die($mysqli->error . " " . $mysqli->error);
@@ -301,14 +365,10 @@
             $("#modal-1").modal('show');
         }
     </script>
-
-
-
     <?php 
             else: 
                 header("Location: index.php");    
             endif; 
         ?>
-
     </body>
 </html>

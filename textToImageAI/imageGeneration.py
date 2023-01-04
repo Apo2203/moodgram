@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import openai, sys
+import openai, sys, os, time
 API_KEY = "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"
 openai.api_key = API_KEY
 inputText = str(sys.argv[1]) #text I'll use to generate the image
@@ -24,4 +24,6 @@ f = open("/var/www/html/moodgram/textToImageAI/tmp/" + str(sys.argv[2]), "w+")
 f.write(image_url)
 f.close()
 
-# to run this code from a php file look the example in "test.php"
+#I wait until the php script finish to work on this temporary file and I delete it
+time.sleep(10)
+os.remove("/var/www/html/moodgram/textToImageAI/tmp/" + str(sys.argv[2]))

@@ -1,12 +1,12 @@
 <?php
 
 $command = "python3 /var/www/html/moodgram/textToImageAI/imageGeneration.py "; //command to exec the python code
-$inputText = "'mouse dancing'";//$_POST["inputText"]; // double quotes needed to send a string with more than one word
+$inputText = $_POST["inputText"]; 
+$inputText = "'$inputText'"; // quotes needed to send more than one word in a string
+
 $command = ($command.$inputText." ");
 $uniqID = uniqid();
 $command = ($command.$uniqID)." &";
-
-echo($command);
 
 shell_exec($command);
 sleep(10);
@@ -20,5 +20,4 @@ $img = '/var/www/html/moodgram/assets/img/generatedImage/'.$new_img_name.'.jpg';
 
 // Save image 
 file_put_contents($img, file_get_contents($imgurl));
-
 ?>

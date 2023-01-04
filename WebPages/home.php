@@ -123,7 +123,7 @@
                 <div class="shadow d-flex flex-column justify-content-center align-items-center backgroundContent" data-bss-hover-animate="pulse" style="background: url(&quot;../assets/img/emojibackground.png?h=2a5cd7d3a9c31ae0d60e9c7bac9d2531&quot;) center / cover no-repeat;">
                     <h1 class="display-1 fs-1 fw-bold text-center" style="color: rgb(255,255,255);letter-spacing: 4px;line-height: 48px;font-family: Aboreto, serif;">Welcome back...</h1>
                     <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Write here your today's status</p>
-                    <form class="text-center" method="post" action="../textToImageAI/test.php">
+                    <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
                         <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
                         <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
                     </form>

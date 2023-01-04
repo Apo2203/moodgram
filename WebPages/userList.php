@@ -2,6 +2,23 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
+
+    if(isset($_GET["searchUser"])){
+        $input = $_GET["searchUser"];
+        $input = "%$input%";
+        $searchQuery = "SELECT name, surname, id, profilePicture, followers FROM user WHERE `name` LIKE ? OR `surname` LIKE ?";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($searchQuery)) {
+        die("SQL error: " . $mysqli->error);
+        }
+        $stmt->bind_param("ss",
+            $input,
+            $input
+        );
+        $stmt->execute();
+        $stmt->store_result();
+        $stmt->bind_result($userName, $UserSurname, $id, $proPic, $followers);
+    }
 ?>
 
 <!DOCTYPE html>
@@ -28,8 +45,8 @@
             <div class="collapse navbar-collapse" id="navcol-5" style="padding-left: 0;width: 300px;">
                 <div class="d-inline-flex justify-content-center">
                     <div class="searchbar">
-                        <form class="d-sm-flex d-xxl-flex justify-content-sm-center align-items-sm-center justify-content-xxl-center align-items-xxl-center" action="userList.php" method="post">
-                            <input type="text" class="search_input" placeholder="Search user...">
+                        <form class="d-sm-flex d-xxl-flex justify-content-sm-center align-items-sm-center justify-content-xxl-center align-items-xxl-center" action="userList.php" method="get">
+                            <input type="text" class="search_input" placeholder="Search user..." name="searchUser">
                             <button class="btn search-icon" type="submit"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></button>
                         </form>
                     </div>
@@ -39,18 +56,24 @@
         </div>
     </nav>
     <section>
-        <p class="text-center" style="font-family: Poppins, sans-serif;font-size: 2rem;margin-top: 2rem;color: var(--bs-gray-100);margin-bottom: 5rem;">Here is your results for 'Francesco Apollonio'</p>
         
-        <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
-            <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                <div class="col-auto"><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 11rem;border-radius: 2rem;"></a></div>
-                <div class="col-auto">
-                    <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">Francesco Apollonio&nbsp;</span><br></p>
-                    <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                    <p>275 follower</p>
-                </div>
-            </div>
-        </div>
+        <?php
+            echo('<p class="text-center" style="font-family: Poppins, sans-serif;font-size: 2rem;margin-top: 2rem;color: var(--bs-gray-100);margin-bottom: 5rem;">Here is your results for "'.substr($input, 1, -1).'"</p>');
+            while($stmt->fetch()){
+                echo('
+                    <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
+                        <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
+                            <div class="col-auto"><a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 11rem;border-radius: 2rem;"></a></div>
+                            <div class="col-auto">
+                                <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$UserSurname.'&nbsp;</span><br></p>
+                                <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
+                                <p>'.$followers.' follower</p>
+                            </div>
+                        </div>
+                    </div>
+                ');
+            }
+        ?>
         <footer class="text-center py-4">
             <div class="container">
                 <div class="row row-cols-1 row-cols-lg-3">

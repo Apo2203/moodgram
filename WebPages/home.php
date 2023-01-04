@@ -107,8 +107,8 @@
             <div class="collapse navbar-collapse" id="navcol-5" style="padding-left: 0;width: 300px;">
                 <div class="d-inline-flex justify-content-center">
                     <div class="searchbar">
-                        <form class="d-sm-flex d-xxl-flex justify-content-sm-center align-items-sm-center justify-content-xxl-center align-items-xxl-center" action="userList.php" method="post">
-                            <input type="text" class="search_input" placeholder="Search user...">
+                        <form class="d-sm-flex d-xxl-flex justify-content-sm-center align-items-sm-center justify-content-xxl-center align-items-xxl-center" action="userList.php" method="get">
+                            <input type="text" class="search_input" placeholder="Search user..." name="searchUser">
                             <button class="btn search-icon" type="submit"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></button>
                         </form>
                     </div>

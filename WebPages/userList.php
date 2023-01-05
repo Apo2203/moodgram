@@ -97,7 +97,7 @@
                     $stmt3->bind_result($partnerName, $partnerSurname, $partnerProPic);
                     $stmt3->fetch();
                 } 
-        ?>   
+                ?>   
                     <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
                         <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
                             <?php echo (' <div class="col-auto"><a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 11rem;border-radius: 2rem;"></a></div> ') ?>

@@ -340,35 +340,98 @@ if($numRelationship == 0){
             }
         ?>
         </div>
-        <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>') ?>
+        
+        <?php
+            //Select and show all the post of the user
+            $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.id as id1, u2.id as id2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, 
+            (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, 
+            (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
+            FROM post p, user u1, user u2
+            WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1 WHERE ref_user1 = ? OR ref_user2 = ?)
+            GROUP BY p.id_post";
+            $stmt = $mysqli->stmt_init();
+            if (! $stmt->prepare($sql)) {
+                die("SQL error: " . $mysqli->error);
+            }    
+            $stmt->bind_param("ii", $_GET["id_user"], $_GET["id_user"]);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        <div class="container Cardsize" style="margin-bottom: 7rem;">
-            <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #B5B03B;">
-                <div class="col">
-                    <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: rgb(255,255,255);text-shadow: 0px 0px 5px var(--bs-black);margin-bottom: 0.5rem;"><span style="font-weight: normal !important;">Francesco Apollonio &amp; Gabriele Scamardo</span></p><a href="#"><img src="../assets/img/profilo.jpg?h=4729c86147fa4b04af88846b09b6d0e2" style="width: 3rem;border-radius: 3rem;"></a>
-                    <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;"><strong>75%</strong></p><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>
-                    <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;"><strong>25%</strong></p>
-                    <div>
-                        <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;"><em>21 Novembre 2022</em></p>
-                        <div class="dropend float-end"><button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;"><i class="far fa-sun"></i></button>
-                            <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;"><a class="dropdown-item" href="#">Report Post</a><a class="dropdown-item" href="#" style="color: rgb(255,0,0);">Delete post</a></div>
+            // If the user have at least one post
+            if ($result->num_rows > 0)
+                echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 5rem;"><span style="color: rgb(255, 255, 255);">Here is '.$userName.'\'s post</span></p>');
+
+            while($data = $result->fetch_assoc()){
+                echo('
+                <div class="container Cardsize" style="margin-bottom: 7rem;">
+                    <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
+                        <div class="col">
+                            <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
+                                <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
+                            </p>
+                            <a href="Profile.php?id_user='.$data['id1'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
+                                <strong>'.$data['voteImg1'].'</strong>
+                            </p>
+                            <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                            <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
+                                <strong>'.$data['voteImg2'].'</strong>
+                            </p>
+                            <div>
+                                <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;">
+                                    <em>'.$data['date'].'</em>
+                                </p>
+                                <div class="dropend float-end">
+                                    <button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;">
+                                        <i class="far fa-sun"></i>
+                                    </button>
+                                    ');
+                                    if ($isAdmin == "TRUE"){
+                                        echo('
+                                            <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
+                                                <a class="dropdown-item" href="#">Report Post</a>
+                                                <a class="dropdown-item" href="./home.php?deletePost='.$data["id_post"].'" style="color: rgb(255,0,0);">Delete post</a>
+                                            </div>
+                                        ');
+                                    }
+                                    else{
+                                        echo('
+                                            <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
+                                                <a class="dropdown-item" href="#">Report Post</a>
+                                            </div>
+                                        ');
+                                    }
+                                    echo('
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin: 0;">
+                        <div class="col col-style-sx" data-bss-hover-animate="pulse">
+                            <a href="#"> 
+                                <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
+                                    <i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i>
+                                </div>
+                            </a>
+                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'">
+                        </div>
+                        <div class="col col-style-dx" data-bss-hover-animate="pulse">
+                            <a href="#">
+                                <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                            </a>
+                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'">
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row" style="margin: 0;">
-                <div class="col col-style-sx" data-bss-hover-animate="pulse"><a href="#">
-                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i></div>
-                    </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger.png?h=e0aa4534da8ccd026056745bbc4a9199"></div>
-                <div class="col col-style-dx" data-bss-hover-animate="pulse"><a href="#">
-                        <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-heart"></i></div>
-                    </a><img class="img-fluid image-style" src="../assets/img/angry%20like%20a%20tiger%20(1).png?h=fa6df617871770de8ed2775f9ba4ac8f"></div>
-            </div>
-        </div>
+            ');
+            }
+        ?>
         <div class="container NoMorePostSizeForBigScreen" style="margin-bottom: 7rem;">
             <div class="row" data-aos="zoom-in" data-aos-duration="1000" data-aos-once="true" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #549ad4;">
                 <div class="col text-center">
-                    <p style="color: rgb(0,0,0);text-align: center;font-size: 2rem;font-family: Aboreto, serif;">It's all, no more post to show you</p><img src="../assets/img/allPostSeen.png?h=e404b28546662f09501ec78b4461766c" style="width: 30%;">
+                    <p style="color: rgb(0,0,0);text-align: center;font-size: 2rem;font-family: Aboreto, serif;">It's all, no post to show you</p><img src="../assets/img/allPostSeen.png?h=e404b28546662f09501ec78b4461766c" style="width: 30%;">
                 </div>
             </div>
         </div>

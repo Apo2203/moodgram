@@ -2,7 +2,8 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
     $isMyPage = FALSE;
-    $alreadyRelationship = FALSE;
+    $currentUserRelationship = FALSE;
+    $ImInRelationship = FALSE;
     $isAdmin = FALSE;
 
     // Check to avoid some cybersecurity attack
@@ -48,25 +49,57 @@
         $actualFollower = $array[0];
     }
 
-    //Check if a user is already in a relationship
-    $sql = "SELECT * FROM relationship WHERE (ref_user_1 = ? OR ref_user_2 = ? OR ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
+    //Check if the user we are looking is already in a relationship
+    $sql = "SELECT rel.ref_user_1 as id1, rel.ref_user_2 as id2 FROM relationship rel WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
     $stmt = $mysqli->stmt_init();
     if (! $stmt->prepare($sql)) {
         die("SQL error: " . $mysqli->error);
     }    
-    $stmt->bind_param("iiii",
+    $stmt->bind_param("ii",
     $currentIdUserPage,
     $currentIdUserPage,
-    $_SESSION["user_id"],
-    $_SESSION["user_id"]
     );
 
     $stmt->execute();
     $stmt->store_result();
     if($stmt->num_rows > 0){
-        $alreadyRelationship = TRUE;
+        // The user we are looking is in a relationship
+        $currentUserRelationship = TRUE;
+        // Check for the ID and then basic information about the partner of this user
+        $stmt->bind_result($id1, $id2);
+        $stmt->fetch();
+        if ($id1 == $currentIdUserPage) $partnerId = $id2;
+        else                            $partnerId = $id1;
+
+        $getPartnerInfo = "SELECT name, surname, profilePicture FROM user WHERE id = ?";
+        $stmt2 = $mysqli->stmt_init();
+        if (! $stmt2->prepare($getPartnerInfo)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        $stmt2->bind_param("i", $partnerId);
+        $stmt2->execute();
+        $stmt2->store_result();
+        $stmt2->bind_result($partnerName, $partnerSurname, $partnerProPic);
+        $stmt2->fetch();
+
     } 
 
+    //Check if the actual user (Me) is already in a relationship
+    $sql = "SELECT * FROM relationship WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
+    $stmt = $mysqli->stmt_init();
+    if (! $stmt->prepare($sql)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt->bind_param("ii",
+    $_SESSION["user_id"],
+    $_SESSION["user_id"],
+    );
+
+    $stmt->execute();
+    $stmt->store_result();
+    if($stmt->num_rows > 0){
+        $ImInRelationship = TRUE;
+    } 
 
     //ASK RELATIONSHIP
     $checkRelationship = "SELECT * FROM relationship WHERE (ref_user_1 = ? AND ref_user_2 = ?) OR (ref_user_2 = ? AND ref_user_1 = ?)";
@@ -270,7 +303,19 @@ if($numRelationship == 0){
             <div class="row d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center" style="margin-left: 15%;margin-right: 15%;">
                 <div class="col-12 col-xxl-12 text-center myProfileInformationXS" style="background: #4e95ce;border-radius: 3rem;box-shadow: 0px 0px 9px 0px;margin: 1rem;padding-top: 7px;">
                     <?php echo(' <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$userSurname.'&nbsp;</span><br></p> ') ?>
-                    <?php echo(' <p style="font-family: Poppins, sans-serif;font-size: 20px;"><span style="color: rgb(255, 255, 255);">In a relationship with </span><a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a><strong><span style="color: rgb(255, 255, 255);">&nbsp;</span></strong><span style="color: rgb(255, 255, 255);">Tizia Caia</span></p>') ?>
+                    <?php
+                        if ($currentUserRelationship == TRUE){
+                            echo('
+                                <p style="font-family: Poppins, sans-serif;font-size: 20px;">
+                                <span style="color: rgb(255, 255, 255);">In a relationship with </span>
+                                <a href="Profile.php?id_user='.$partnerId.'"><img src="../assets/img/profilePictureImage/'.$partnerProPic.'" style="width: 3rem;border-radius: 3rem;"></a>
+                                <strong>
+                                    <span style="color: rgb(255, 255, 255);">&nbsp;</span>
+                                </strong>
+                                <span style="color: rgb(255, 255, 255);">'.$partnerName.' '.$partnerSurname.'</span></p>
+                            ');
+                        }
+                    ?>
                     <?php echo(' <p style="font-size: 20px;"><span style="color: rgb(255, 255, 255);">'.$followers.' follower</span></p>') ?>
                 </div>
         </div>
@@ -283,7 +328,7 @@ if($numRelationship == 0){
                     }else{
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-primary btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&follow=TRUE\';" style="background: rgb(176,59,181);border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Follow</button></div> ');
                     }
-                    if($alreadyRelationship == FALSE){
+                    if($currentUserRelationship == FALSE && $ImInRelationship == FALSE){
                         echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-success btn-sm" data-bss-hover-animate="pulse" type="button" onclick="window.location.href=\'Profile.php?id_user='.$currentIdUserPage.'&askRelationship=TRUE\';" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Ask Relation</button></div>');
                     }
                     echo(' <div class="col d-xl-flex align-items-center justify-content-xl-center"><button class="btn btn-warning btn-sm" data-bss-hover-animate="pulse" type="button" style="border-radius: 1rem;margin: 7px;font-size: 25px;border-color: var(--bs-gray-900);">Report</button></div>');

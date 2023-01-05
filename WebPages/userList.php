@@ -63,19 +63,62 @@
         <?php
             echo('<p class="text-center" style="font-family: Poppins, sans-serif;font-size: 2rem;margin-top: 2rem;color: var(--bs-gray-100);margin-bottom: 5rem;">Here is your results for "'.substr($input, 1, -1).'"</p>');
             while($stmt->fetch()){
-                echo('
+                //Check if the user we are loading is in a relationship
+                $currentUserRelationship = FALSE;
+                $sql = "SELECT rel.ref_user_1 as id1, rel.ref_user_2 as id2 FROM relationship rel WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
+                $stmt2 = $mysqli->stmt_init();
+                if (! $stmt2->prepare($sql)) {
+                    die("SQL error: " . $mysqli->error);
+                }    
+                $stmt2->bind_param("ii",
+                $id,
+                $id,
+                );
+
+                $stmt2->execute();
+                $stmt2->store_result();
+                if($stmt2->num_rows > 0){
+                    // The user we are looking is in a relationship
+                    $currentUserRelationship = TRUE;
+                    // Check for the ID and then basic information about the partner of this user
+                    $stmt2->bind_result($id1, $id2);
+                    $stmt2->fetch();
+                    if ($id1 == $id) $partnerId = $id2;
+                    else             $partnerId = $id1;
+
+                    $getPartnerInfo = "SELECT name, surname, profilePicture FROM user WHERE id = ?";
+                    $stmt3 = $mysqli->stmt_init();
+                    if (! $stmt3->prepare($getPartnerInfo)) {
+                        die("SQL error: " . $mysqli->error);
+                    }    
+                    $stmt3->bind_param("i", $partnerId);
+                    $stmt3->execute();
+                    $stmt3->store_result();
+                    $stmt3->bind_result($partnerName, $partnerSurname, $partnerProPic);
+                    $stmt3->fetch();
+                } 
+        ?>   
                     <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
                         <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                            <div class="col-auto"><a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 11rem;border-radius: 2rem;"></a></div>
+                            <?php echo (' <div class="col-auto"><a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 11rem;border-radius: 2rem;"></a></div> ') ?>
                             <div class="col-auto">
-                                <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$UserSurname.'&nbsp;</span><br></p>
-                                <p style="font-family: Poppins, sans-serif;font-size: 18px;">In a relationship with&nbsp;<a href="#"><img src="../assets/img/Screenshot%20from%202022-11-10%2011-59-32.png?h=26c4a675f562e371846f24f151d2a0ed" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;Tizia Caia</p>
-                                <p>'.$followers.' follower</p>
+                                <?php echo (' <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$UserSurname.'&nbsp;</span><br></p> ') ?>
+                                <?php
+                                    if ($currentUserRelationship == TRUE){
+                                        echo ('
+                                            <p style="font-family: Poppins, sans-serif;font-size: 18px;">
+                                                In a relationship with&nbsp;
+                                                <a href="Profile.php?id_user='.$partnerId.'"><img src="../assets/img/profilePictureImage/'.$partnerProPic.'" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;'.$partnerName.' '.$partnerSurname.'
+                                            </p>
+                                        ');
+                                    }
+                                ?>
+                                <?php echo (' <p>'.$followers.' follower</p> ') ?>
                             </div>
                         </div>
                     </div>
-                ');
-            }
+                
+            <?php } ?>
         ?>
         <footer class="text-center py-4">
             <div class="container">

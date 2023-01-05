@@ -2,7 +2,6 @@
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
     $isAdmin = FALSE;
-    
     // Check to avoid some cybersecurity attack
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
     if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");
@@ -184,7 +183,7 @@
                                         <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
                                             <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
                                         </p>
-                                        <a href="Profile.php?id_user='.$data['id1'].'/">
+                                        <a href="Profile.php?id_user='.$data['id1'].'">
                                             <img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;">
                                         </a>
                                         <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">

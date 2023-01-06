@@ -3,21 +3,22 @@
 $mysqli = require __DIR__ . "/../dataBase/database.php";
 session_start();
 
-$command = "/usr/bin/python3 /var/www/html/moodgram/textToImageAI/imageGeneration.py "; //command to exec the python code
-
 $inputText = $_POST["inputText"]; 
-$inputText = "'$inputText'"; // quotes needed to send more than one word in a string
+$curlquery = " https://api.openai.com/v1/images/generations \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer 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' \
+  -d '{
+    \"prompt\": \"$inputText\",
+    \"n\": 1,
+    \"size\": \"512x512\"
+  }' ";
 
-$command = ($command.$inputText." ");
-$uniqID = uniqid();
-$command = ($command.$uniqID)." &";
-echo($command);
 
-shell_exec($command);
-sleep(10);
-$file = "/var/www/html/moodgram/textToImageAI/tmp/".$uniqID;
-$fh = fopen($file,'r');
-$imgurl = fgets($fh);
+$result = (shell_exec("curl".$curlquery));
+// Regex to get just the image url from the curl answer
+preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $result, $match);
+$imgurl = ($match[0][0]); 
+
 
 // Image path
 $new_img_name = uniqid("GEN-IMG-");
@@ -25,7 +26,7 @@ $img = '/var/www/html/moodgram/assets/img/generatedImage/'.$new_img_name.'.jpg';
 
 // Save image 
 file_put_contents($img, file_get_contents($imgurl));
-
+/*
 // Save the image on the database
 $sql = "SELECT * FROM post WHERE ref_user1 = ? OR ref_user2 = ?";
 $stmt = $mysqli->stmt_init();
@@ -93,5 +94,5 @@ else{
     );
     $stmt->execute();
 }
-
+*/
 ?>

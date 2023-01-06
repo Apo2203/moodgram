@@ -348,7 +348,8 @@ if($numRelationship == 0){
             (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
             FROM post p, user u1, user u2
             WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1 WHERE ref_user1 = ? OR ref_user2 = ?)
-            GROUP BY p.id_post";
+            GROUP BY p.id_post
+            ORDER BY date DESC";
             $stmt = $mysqli->stmt_init();
             if (! $stmt->prepare($sql)) {
                 die("SQL error: " . $mysqli->error);

@@ -175,10 +175,11 @@
                 <div class="shadow d-flex flex-column justify-content-center align-items-center backgroundContent" data-bss-hover-animate="pulse" style="background: url(&quot;../assets/img/emojibackground.png?h=2a5cd7d3a9c31ae0d60e9c7bac9d2531&quot;) center / cover no-repeat;">
                     <h1 class="display-1 fs-1 fw-bold text-center" style="color: rgb(255,255,255);letter-spacing: 4px;line-height: 48px;font-family: Aboreto, serif;">Welcome back...</h1>
                     <?php
+                    // Check If the user still have to update the mood or not
                         if ($ImInRelationship == TRUE){
-                            date_default_timezone_set('Africa/Nairobi');
+                            date_default_timezone_set('Europe/Rome');
                             $date = date('Y-m-d', time());
-                            $sql = "SELECT * FROM post WHERE date = ? AND (ref_user1 = ? OR ref_user2 = ?)";
+                            $sql = "SELECT * FROM post WHERE post.date = ? AND (ref_user1 = ? OR ref_user2 = ?)";
                             $stmt = $mysqli->stmt_init();
                             if (! $stmt->prepare($sql)) {
                                 die("SQL error: " . $mysqli->error);
@@ -193,32 +194,46 @@
                             $stmt->store_result();
                             if($stmt->num_rows == 0){ 
                                 // You have to update your today's mood
-                                echo (' <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Write here your today\'s status '.$date.'</p> ');
+                                echo ('
+                                    <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Write here your today\'s status '.$date.'</p> 
+                                    <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
+                                        <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
+                                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
+                                    </form>
+                                    ');
                             }
                             else{
-                                echo (' <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">You already update your status in date: '.$date.'</p> ');
-
+                                // Check if the second user already update the image
+                                echo ('
+                                    <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">You already update your status today: '.$date.'</p> 
+                                    <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
+                                        <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
+                                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
+                                    </form>
+                                ');
                             }
                         }
                         else {
-                            echo ('<p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Find a partner to share your status and start the fight!</p>');
+                            echo ('
+                                <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Find a partner to share your status and start the fight!</p>
+                                <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
+                                    <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
+                                    <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal" disabled>Upload my status</button>
+                                </form>
+                            ');
                         }
                     ?>
-                    <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
-                        <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
-                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
-                    </form>
                 </div>
             </div>
         </section>
         <section style="margin-top: 10rem;">
             <?php
-                
                 $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.id as id1, u2.id as id2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, 
                 (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
                 FROM post p, user u1, user u2
                 WHERE p.ref_user1 = u1.id AND p.visibility = 1 AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1, friendship f WHERE f.ref_user_1 = ".$_SESSION["user_id"]." AND (p1.ref_user1 = f.ref_user_2 OR p1.ref_user2 = f.ref_user_2))
-                GROUP BY p.id_post";                
+                GROUP BY p.id_post
+                ORDER BY date DESC";                
                         
                 $result = $mysqli->query($sql);
                 

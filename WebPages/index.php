@@ -1,6 +1,7 @@
 <?php
-$is_invalid = false; // value useful to know if the login information are valid or no
+/* Login page: the first page */
 
+$is_invalid = false; // value useful to know if the login information are valid or no
 if ($_SERVER["REQUEST_METHOD"] === "POST"){
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     $sql = sprintf("SELECT * FROM user WHERE email = '%s'", $mysqli->real_escape_string($_POST["email"]));
@@ -17,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST"){
     $is_invalid = true;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

@@ -1,264 +1,253 @@
 <?php
+/* Profile page: here the user can
+    - See information about a registered profile (followers, partner, post)
+    - Follow / Unfollow
+    - Ask for a relationship if allowed (not already in a relationship)
+    - Ban the user IF ADMIN
+*/
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
-    $isMyPage = FALSE;
-    $currentUserRelationship = FALSE;
-    $ImInRelationship = FALSE;
-    $isAdmin = FALSE;
 
-    // Check to avoid some cybersecurity attack
+    $isMyPage = FALSE; // The page showed is about my profile?
+    $currentUserRelationship = FALSE; // The user showed in the page is in a relationship?
+    $ImInRelationship = FALSE;  // I am in a relationship?
+    $isAdmin = FALSE;  // Am I an admin?
+
+    // Some check to avoid some security issues
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
     if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");
 
-        if (isset ($_GET['id_user'])){
-        $currentIdUserPage = $_GET['id_user'];
+    if (isset ($_GET['id_user'])){
+    $currentIdUserPage = $_GET['id_user'];
 
-        //Check if the ID exist
-        $idExist = "SELECT `id` FROM user WHERE id = ?";
+    //Check if the ID (this user) exist
+    $idExist = "SELECT `id` FROM user WHERE id = ?";
+    $stmt = $mysqli->stmt_init();
+    if (! $stmt->prepare($idExist)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt->bind_param("i", $currentIdUserPage);
+    $stmt->execute();
+    $stmt->store_result();
+    if($stmt->num_rows != 1){
+        header("Location: ./userNotExist.php");
+    }
+    if($_GET['id_user'] == $_SESSION["user_id"]){
+        $isMyPage = TRUE;
+    }
+
+    //Check the number of follower
+    $getFollower = "SELECT followers FROM user WHERE id = ?";
+    $stmt = $mysqli->stmt_init();
+    if (! $stmt->prepare($getFollower)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    
+    $stmt->bind_param("i", $currentIdUserPage);
+    $stmt->execute();
+    $array = [];
+    foreach ($stmt->get_result() as $row){
+        $array[] = $row['followers'];
+    }
+    $actualFollower = $array[0];
+}
+
+//Check if the user we are looking is already in a relationship
+$sql = "SELECT rel.ref_user_1 as id1, rel.ref_user_2 as id2 FROM relationship rel WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
+$stmt = $mysqli->stmt_init();
+if (! $stmt->prepare($sql)) {
+    die("SQL error: " . $mysqli->error);
+}    
+$stmt->bind_param("ii",
+$currentIdUserPage,
+$currentIdUserPage,
+);
+$stmt->execute();
+$stmt->store_result();
+if($stmt->num_rows > 0){
+    // The user is already in a relationship
+    $currentUserRelationship = TRUE;
+    // Check for the ID and then basic information about the partner of this user
+    $stmt->bind_result($id1, $id2);
+    $stmt->fetch();
+    if ($id1 == $currentIdUserPage) $partnerId = $id2;
+    else                            $partnerId = $id1;
+
+    $getPartnerInfo = "SELECT name, surname, profilePicture FROM user WHERE id = ?";
+    $stmt2 = $mysqli->stmt_init();
+    if (! $stmt2->prepare($getPartnerInfo)) {
+        die("SQL error: " . $mysqli->error);
+    }    
+    $stmt2->bind_param("i", $partnerId);
+    $stmt2->execute();
+    $stmt2->store_result();
+    $stmt2->bind_result($partnerName, $partnerSurname, $partnerProPic);
+    $stmt2->fetch();
+} 
+
+//Check if the actual user (Me) is already in a relationship
+$sql = "SELECT * FROM relationship WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
+$stmt = $mysqli->stmt_init();
+if (! $stmt->prepare($sql)) {
+    die("SQL error: " . $mysqli->error);
+}    
+$stmt->bind_param("ii",
+$_SESSION["user_id"],
+$_SESSION["user_id"],
+);
+$stmt->execute();
+$stmt->store_result();
+if($stmt->num_rows > 0){
+    $ImInRelationship = TRUE;
+} 
+
+//Ask for a relationship
+$checkRelationship = "SELECT * FROM relationship WHERE (ref_user_1 = ? AND ref_user_2 = ?) OR (ref_user_2 = ? AND ref_user_1 = ?)";
+$stmt = $mysqli->stmt_init();
+if (! $stmt->prepare($checkRelationship)) {
+    die("SQL error: " . $mysqli->error);
+}    
+$stmt->bind_param("iiii",
+$_SESSION["user_id"],
+$_GET["id_user"],
+$_SESSION["user_id"],
+$_GET["id_user"]
+);
+$stmt->execute();
+$stmt->store_result();
+$numRelationship = $stmt->num_rows;
+
+if($numRelationship == 0){
+    if(isset($_GET['askRelationship']) && $_GET['askRelationship'] == "TRUE"){
+        $sql = "INSERT INTO `relationship` (`ref_user_1`, `ref_user_2`, `confirmed`) VALUES (?, ?, '0');";
         $stmt = $mysqli->stmt_init();
-        if (! $stmt->prepare($idExist)) {
+
+        if (! $stmt->prepare($sql)) {
             die("SQL error: " . $mysqli->error);
         }    
-        
-        $stmt->bind_param("i", $currentIdUserPage);
+        $stmt->bind_param("ii",
+        $_SESSION["user_id"],
+        $_GET["id_user"]
+        );
         $stmt->execute();
-        $stmt->store_result();
+        header("Location: ./Profile.php?id_user=$currentIdUserPage");
+    }
+}
 
+// Follow someone
+$checkFriendship = "SELECT * FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
+$alreadyFollow = FALSE;
+$stmt = $mysqli->stmt_init();
+if (! $stmt->prepare($checkFriendship)) {
+    die("SQL error: " . $mysqli->error);
+}    
+$stmt->bind_param("ii",
+$_SESSION["user_id"],
+$_GET["id_user"]);
+$stmt->execute();
+$stmt->store_result();
+$numFollow = $stmt->num_rows;
 
-        if($stmt->num_rows != 1){
-            header("Location: ./userNotExist.php");
-        }
+if($numFollow == 0){
+    if(isset($_GET["follow"]) && $_GET["follow"] == 'TRUE'){
+        $follow = "INSERT INTO friendship VALUES (?, ?)";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($follow)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        $stmt->bind_param("ii",
+        $_SESSION["user_id"],
+        $_GET["id_user"]);
+        $stmt->execute();
 
-        if($_GET['id_user'] == $_SESSION["user_id"]){
-            $isMyPage = TRUE;
-        }
-
-        //Check the actual number of follower
-        $getFollower = "SELECT followers FROM user WHERE id = ?";
+        //Update followers on database
+        $getFollower = "UPDATE user SET followers = ? WHERE id = ?";
         $stmt = $mysqli->stmt_init();
         if (! $stmt->prepare($getFollower)) {
             die("SQL error: " . $mysqli->error);
         }    
-        
-        $stmt->bind_param("i", $currentIdUserPage);
+        $actualFollower = ($actualFollower + 1);
+        $stmt->bind_param("ii",
+        ($actualFollower),
+        $currentIdUserPage);
         $stmt->execute();
-        $array = [];
-        foreach ($stmt->get_result() as $row){
-            $array[] = $row['followers'];
-        }
-        $actualFollower = $array[0];
+        header("Location: ./Profile.php?id_user=$currentIdUserPage");
     }
-
-    //Check if the user we are looking is already in a relationship
-    $sql = "SELECT rel.ref_user_1 as id1, rel.ref_user_2 as id2 FROM relationship rel WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
-    $stmt = $mysqli->stmt_init();
-    if (! $stmt->prepare($sql)) {
-        die("SQL error: " . $mysqli->error);
-    }    
-    $stmt->bind_param("ii",
-    $currentIdUserPage,
-    $currentIdUserPage,
-    );
-
-    $stmt->execute();
-    $stmt->store_result();
-    if($stmt->num_rows > 0){
-        // The user we are looking is in a relationship
-        $currentUserRelationship = TRUE;
-        // Check for the ID and then basic information about the partner of this user
-        $stmt->bind_result($id1, $id2);
-        $stmt->fetch();
-        if ($id1 == $currentIdUserPage) $partnerId = $id2;
-        else                            $partnerId = $id1;
-
-        $getPartnerInfo = "SELECT name, surname, profilePicture FROM user WHERE id = ?";
-        $stmt2 = $mysqli->stmt_init();
-        if (! $stmt2->prepare($getPartnerInfo)) {
-            die("SQL error: " . $mysqli->error);
-        }    
-        $stmt2->bind_param("i", $partnerId);
-        $stmt2->execute();
-        $stmt2->store_result();
-        $stmt2->bind_result($partnerName, $partnerSurname, $partnerProPic);
-        $stmt2->fetch();
-
-    } 
-
-    //Check if the actual user (Me) is already in a relationship
-    $sql = "SELECT * FROM relationship WHERE (ref_user_1 = ? OR ref_user_2 = ?) AND confirmed = 1";
-    $stmt = $mysqli->stmt_init();
-    if (! $stmt->prepare($sql)) {
-        die("SQL error: " . $mysqli->error);
-    }    
-    $stmt->bind_param("ii",
-    $_SESSION["user_id"],
-    $_SESSION["user_id"],
-    );
-
-    $stmt->execute();
-    $stmt->store_result();
-    if($stmt->num_rows > 0){
-        $ImInRelationship = TRUE;
-    } 
-
-    //ASK RELATIONSHIP
-    $checkRelationship = "SELECT * FROM relationship WHERE (ref_user_1 = ? AND ref_user_2 = ?) OR (ref_user_2 = ? AND ref_user_1 = ?)";
-    
-    $stmt = $mysqli->stmt_init();
-    
-    if (! $stmt->prepare($checkRelationship)) {
-        die("SQL error: " . $mysqli->error);
-    }    
-    $stmt->bind_param("iiii",
-    $_SESSION["user_id"],
-    $_GET["id_user"],
-    $_SESSION["user_id"],
-    $_GET["id_user"]
-    );
-
-    $stmt->execute();
-    $stmt->store_result();
-    $numRelationship = $stmt->num_rows;
-
-
-if($numRelationship == 0){
-    if (isset($_GET['askRelationship']) && $_GET['askRelationship'] == "TRUE"){
-            $sql = "INSERT INTO `relationship` (`ref_user_1`, `ref_user_2`, `confirmed`) VALUES (?, ?, '0');";
-            $stmt = $mysqli->stmt_init();
-
-            if (! $stmt->prepare($sql)) {
-                die("SQL error: " . $mysqli->error);
-            }    
-            $stmt->bind_param("ii",
-            $_SESSION["user_id"],
-            $_GET["id_user"]
-            );
-            $stmt->execute();
-            header("Location: ./Profile.php?id_user=$currentIdUserPage");
-        }
+}else{
+    $alreadyFollow = TRUE;
 }
 
-    //FOLLOW
-    $checkFriendship = "SELECT * FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
-    $alreadyFollow = FALSE;
+//Unfollow someone
+if(isset($_GET["follow"]) && $_GET["follow"] == 'FALSE'){
+    $removeFollow = "DELETE FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
     $stmt = $mysqli->stmt_init();
-
-        if (! $stmt->prepare($checkFriendship)) {
-            die("SQL error: " . $mysqli->error);
-        }    
-        
-        $stmt->bind_param("ii",
-        $_SESSION["user_id"],
-        $_GET["id_user"]);
-
-        $stmt->execute();
-        $stmt->store_result();
-        $numFollow = $stmt->num_rows;
-
-        if($numFollow == 0){
-            if(isset($_GET["follow"]) && $_GET["follow"] == 'TRUE'){
-                $follow = "INSERT INTO friendship VALUES (?, ?)";
-                $stmt = $mysqli->stmt_init();
-        
-                if (! $stmt->prepare($follow)) {
-                    die("SQL error: " . $mysqli->error);
-                }    
-                
-                $stmt->bind_param("ii",
-                $_SESSION["user_id"],
-                $_GET["id_user"]);
-                $stmt->execute();
-
-                //Update followers on database
-                $getFollower = "UPDATE user SET followers = ? WHERE id = ?";
-                $stmt = $mysqli->stmt_init();
-                if (! $stmt->prepare($getFollower)) {
-                    die("SQL error: " . $mysqli->error);
-                }    
-                
-                $actualFollower = ($actualFollower + 1);
-                $stmt->bind_param("ii",
-                ($actualFollower),
-                $currentIdUserPage);
-                $stmt->execute();
-                header("Location: ./Profile.php?id_user=$currentIdUserPage");
-            }
-        }else{
-            $alreadyFollow = TRUE;
-        }
-
-        //REMOVE FOLLOW
-        if(isset($_GET["follow"]) && $_GET["follow"] == 'FALSE'){
-            $removeFollow = "DELETE FROM friendship WHERE ref_user_1 = ? AND ref_user_2 = ?";
-
-            $stmt = $mysqli->stmt_init();
-        
-            if (! $stmt->prepare($removeFollow)) {
-                die("SQL error: " . $mysqli->error);
-            }    
-            
-            $stmt->bind_param("ii",
-            $_SESSION["user_id"],
-            $_GET["id_user"]);
-            $stmt->execute();
-
-            //Update followers on database
-            $getFollower = "UPDATE user SET followers = ? WHERE id = ?";
-            $stmt = $mysqli->stmt_init();
-            if (! $stmt->prepare($getFollower)) {
-                die("SQL error: " . $mysqli->error);
-            }    
-            
-            $actualFollower = ($actualFollower - 1);
-            $stmt->bind_param("ii",
-            ($actualFollower),
-            $currentIdUserPage);
-            $stmt->execute();
-            
-            header("Location: ./Profile.php?id_user=$currentIdUserPage");
-        }
-    $sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.followers AS followers
-            FROM user u1
-            WHERE u1.id = ?";
-    $stmt = $mysqli->stmt_init();
-    if (! $stmt->prepare($sql)) {
+    if (! $stmt->prepare($removeFollow)) {
         die("SQL error: " . $mysqli->error);
     }    
-    $stmt->bind_param("i",
+    $stmt->bind_param("ii",
+    $_SESSION["user_id"],
     $_GET["id_user"]);
     $stmt->execute();
-    /* bind variables to prepared statement */
-    $stmt->bind_result($proPic1, $userName, $userSurname, $followers);
-    $stmt->fetch();
 
-    // Check if the current user is an administrator
-    $sql = "SELECT * FROM user WHERE id = ? AND role = 'admin'";
+    //Update followers on database
+    $getFollower = "UPDATE user SET followers = ? WHERE id = ?";
     $stmt = $mysqli->stmt_init();
-    if (! $stmt->prepare($sql)) {
+    if (! $stmt->prepare($getFollower)) {
         die("SQL error: " . $mysqli->error);
     }    
-    $stmt->bind_param("i", $_SESSION["user_id"]);
+    $actualFollower = ($actualFollower - 1);
+    $stmt->bind_param("ii",
+    ($actualFollower),
+    $currentIdUserPage);
     $stmt->execute();
-    $stmt->store_result();
-    if ($stmt->num_rows == 1) $isAdmin = TRUE;
+    
+    header("Location: ./Profile.php?id_user=$currentIdUserPage");
+}
 
-    // Ban an account
-    if(isset($_GET["banUser"])){
-        if($isAdmin == TRUE && (! $_GET["banUser"] == $_SESSION["user_id"])){
-            $sql = "DELETE FROM `user` WHERE id = ?";
-            $stmt = $mysqli->stmt_init();
-            if (! $stmt->prepare($sql)) {
-                die("SQL error: " . $mysqli->error);
-            }    
-            $stmt->bind_param("i", $_GET["banUser"]);
-            $stmt->execute();
-            header("Location: ./home.php");
-        }else{
-            session_destroy();
-            header("Location: ./index.php");
-        }
+
+// Check if the current user is an administrator
+$sql = "SELECT * FROM user WHERE id = ? AND role = 'admin'";
+$stmt = $mysqli->stmt_init();
+if (! $stmt->prepare($sql)) {
+die("SQL error: " . $mysqli->error);
+}    
+$stmt->bind_param("i", $_SESSION["user_id"]);
+$stmt->execute();
+$stmt->store_result();
+if ($stmt->num_rows == 1) $isAdmin = TRUE;
+
+// Ban an account
+if(isset($_GET["banUser"])){
+    if($isAdmin == TRUE && (! $_GET["banUser"] == $_SESSION["user_id"])){
+        $sql = "DELETE FROM `user` WHERE id = ?";
+        $stmt = $mysqli->stmt_init();
+        if (! $stmt->prepare($sql)) {
+            die("SQL error: " . $mysqli->error);
+        }    
+        $stmt->bind_param("i", $_GET["banUser"]);
+        $stmt->execute();
+        header("Location: ./home.php");
+    }else{
+        session_destroy();
+        header("Location: ./index.php");
     }
+}
+$sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.followers AS followers
+        FROM user u1
+        WHERE u1.id = ?";
+        
+$stmt = $mysqli->stmt_init();
+if (! $stmt->prepare($sql)) {
+    die("SQL error: " . $mysqli->error);
+}    
+$stmt->bind_param("i",
+$_GET["id_user"]);
+$stmt->execute();
+/* bind variables to prepared statement */
+$stmt->bind_result($proPic1, $userName, $userSurname, $followers);
+$stmt->fetch();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -289,7 +278,10 @@ if($numRelationship == 0){
                             <button class="btn search-icon" type="submit"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></button></form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>

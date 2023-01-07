@@ -1,9 +1,13 @@
 <?php
+/* Page showed if someway we finish on a user page that does not exist */
+
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
-    // Check to avoid some cybersecurity attack
-    if (! isset($_SESSION["user_id"])) header("Location: index.php");    
+
+    // Some check to avoid security issues
+    if (!isset($_SESSION["user_id"])) header("Location: index.php");    
     if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,5 +52,4 @@
     <script src="../assets/js/bs-init.js?h=67ee20cf4e5150919853fca3720bbf0d"></script>
     <script src="../assets/js/Material-Text-Input.js?h=713af0c6ce93dbbce2f00bf0a98d0541"></script>
 </body>
-
 </html>

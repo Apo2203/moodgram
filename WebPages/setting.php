@@ -1,29 +1,32 @@
 <?php
+/* Setting page: here the user is allowed to
+    - Change profile picture image
+    - Change Name / Surname 
+    - Change Password
+    - Delete the account on MoodGram
+*/
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
 
-    // Check to avoid some cybersecurity attack
+    // Some check to avoid some security issues
     if (! isset($_SESSION["user_id"])) header("Location: index.php");    
     if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");
         
+    /* Loading user information */
     $sql = "SELECT u1.profilePicture AS proPic1, u1.name AS userName, u1.surname AS userSurname, u1.email as email
             FROM user u1
             WHERE u1.id = ?";
     $stmt = $mysqli->stmt_init();
-    
     if (! $stmt->prepare($sql)) {
         die("SQL error: " . $mysqli->error);
     }    
-    
     $stmt->bind_param("i",
     $_SESSION["user_id"]);
-    
     $stmt->execute();
     
     /* bind variables to prepared statement */
     $stmt->bind_result($proPic1, $userName, $userSurname, $email);
     $stmt->fetch();
-    
 ?>
 
 <!DOCTYPE html>
@@ -54,13 +57,15 @@
                         <button class="btn search-icon" type="submit"><i class="fas fa-search" style="padding: 0px;margin: 0px;color: rgb(255,255,255);"></i></button></form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>
 
     <section>
-
             <?php echo(' <p class="lead font-monospace fs-3 fw-semibold text-center text-info" style="margin-bottom: 3rem;margin-top: 3rem;color: rgb(255,255,255);"><span style="color: rgb(255, 255, 255);">'.$userName.'\'s Setting</span></p> ') ?>
             <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
                 <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="" data-bs-target="#modal-2" data-bs-toggle="modal">

@@ -105,7 +105,7 @@
                 ?>   
                     <div class="container Cardsize" data-bss-hover-animate="pulse" style="box-shadow: 0px 0px 0px;margin-top: 3rem;width: 50%;">
                         <div class="row d-xl-flex align-items-xl-center" style="border-radius: 3rem;background: #B5B03B;padding: 1rem;margin: 0;margin-bottom: 2rem;box-shadow: 0px 0px 17px 3px;">
-                            <?php echo (' <div class="col-auto"><a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" style="width: 11rem;border-radius: 2rem;"></a></div> ') ?>
+                            <?php echo (' <div class="col-auto"><a href="Profile.php?id_user='.$id.'/"><img src="../assets/img/profilePictureImage/'.$proPic.'" alt="profile picture" style="width: 11rem;border-radius: 2rem;"></a></div> ') ?>
                             <div class="col-auto">
                                 <?php echo (' <p class="fs-2 fw-normal" style="position: relative;display: inline;font-family: Poppins, sans-serif;"><span style="color: rgb(255, 255, 255);">'.$userName.' '.$UserSurname.'&nbsp;</span><br></p> ') ?>
                                 <?php
@@ -113,7 +113,7 @@
                                         echo ('
                                             <p style="font-family: Poppins, sans-serif;font-size: 18px;">
                                                 In a relationship with&nbsp;
-                                                <a href="Profile.php?id_user='.$partnerId.'"><img src="../assets/img/profilePictureImage/'.$partnerProPic.'" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;'.$partnerName.' '.$partnerSurname.'
+                                                <a href="Profile.php?id_user='.$partnerId.'"><img src="../assets/img/profilePictureImage/'.$partnerProPic.'" alt="profile picture" style="width: 3rem;border-radius: 3rem;"></a>&nbsp;'.$partnerName.' '.$partnerSurname.'
                                             </p>
                                         ');
                                     }

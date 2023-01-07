@@ -70,7 +70,7 @@
             <div class="row d-lg-flex justify-content-lg-center align-items-lg-center" style="margin-top: 3rem;margin-bottom: 3rem;margin-right: 0;margin-left: 0;">
                 <div class="col-3 col-style-sx" data-bss-hover-animate="pulse"><a href="" data-bs-target="#modal-2" data-bs-toggle="modal">
                     <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger"><i class="fas fa-images" style="font-size: 4rem;color: var(--bs-primary);"></i></div>
-                    <?php echo(' </a><img class="image-style" src="../assets/img/profilePictureImage/'.$proPic1.'"></div> ') ?>
+                    <?php echo(' </a><img class="image-style" alt="profile picture" src="../assets/img/profilePictureImage/'.$proPic1.'"></div> ') ?>
             </div>
             <div class="col-lg-12 d-lg-flex justify-content-lg-center">
                 <div class="card shadow mb-3">

@@ -290,7 +290,7 @@ $stmt->fetch();
         
         <div style="width: 98%;padding-bottom: 6rem;margin-bottom: 6rem;background: rgba(49,53,150,0);">
             <div class="row g-0 text-center" style="margin-top: 3rem;margin-right: 0;margin-left: 0;">
-            <?php echo(' <div class="col-12 col-style-sx"><img class="image-style profile-picture" src="../assets/img/profilePictureImage/'.$proPic1.'" style="width: 30%;"></div> ')?>
+            <?php echo(' <div class="col-12 col-style-sx"><img class="image-style profile-picture" alt="profile picture" src="../assets/img/profilePictureImage/'.$proPic1.'" style="width: 30%;"></div> ')?>
             </div>
             <div class="row d-flex d-sm-flex d-md-flex d-lg-flex d-xl-flex d-xxl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center" style="margin-left: 15%;margin-right: 15%;">
                 <div class="col-12 col-xxl-12 text-center myProfileInformationXS" style="background: #4e95ce;border-radius: 3rem;box-shadow: 0px 0px 9px 0px;margin: 1rem;padding-top: 7px;">
@@ -300,7 +300,7 @@ $stmt->fetch();
                             echo('
                                 <p style="font-family: Poppins, sans-serif;font-size: 20px;">
                                 <span style="color: rgb(255, 255, 255);">In a relationship with </span>
-                                <a href="Profile.php?id_user='.$partnerId.'"><img src="../assets/img/profilePictureImage/'.$partnerProPic.'" style="width: 3rem;border-radius: 3rem;"></a>
+                                <a href="Profile.php?id_user='.$partnerId.'"><img src="../assets/img/profilePictureImage/'.$partnerProPic.'"  alt="profile picture" style="width: 3rem;border-radius: 3rem;"></a>
                                 <strong>
                                     <span style="color: rgb(255, 255, 255);">&nbsp;</span>
                                 </strong>
@@ -362,11 +362,11 @@ $stmt->fetch();
                             <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
                                 <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
                             </p>
-                            <a href="Profile.php?id_user='.$data['id1'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                            <a href="Profile.php?id_user='.$data['id1'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'"  alt="profile picture" style="width: 3rem;border-radius: 3rem;"></a>
                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
                                 <strong>'.$data['voteImg1'].'</strong>
                             </p>
-                            <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                            <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'"  alt="profile picture" style="width: 3rem;border-radius: 3rem;"></a>
                             <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
                                 <strong>'.$data['voteImg2'].'</strong>
                             </p>
@@ -406,7 +406,7 @@ $stmt->fetch();
                                     <i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i>
                                 </div>
                             </a>
-                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'">
+                            <img class="img-fluid image-style"  alt="profile picture" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'">
                         </div>
                         <div class="col col-style-dx" data-bss-hover-animate="pulse">
                             <a href="#">
@@ -414,7 +414,7 @@ $stmt->fetch();
                                     <i class="fas fa-heart"></i>
                                 </div>
                             </a>
-                            <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'">
+                            <img class="img-fluid image-style"  alt="profile picture" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'">
                         </div>
                     </div>
                 </div>

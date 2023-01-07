@@ -9,7 +9,7 @@ $inputText = $_POST["inputText"];
 /* Generation of the image based on an 'OPENAI' artificial intelligence */
 $curlquery = " https://api.openai.com/v1/images/generations \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer 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' \
+  -H 'Authorization: API KEY' \
   -d '{
     \"prompt\": \"$inputText\",
     \"n\": 1,

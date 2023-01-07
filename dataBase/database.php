@@ -1,4 +1,6 @@
 <?php
+/* This file make me able to handle the database connection */
+
 $host = "localhost";
 $dbname = "moodGramDB";
 $username = "root";

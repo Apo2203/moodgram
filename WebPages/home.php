@@ -191,29 +191,32 @@
                             );
                         
                             $stmt->execute();
-                            $stmt->store_result();
-                            if($stmt->num_rows == 0){ 
+                            $result = $stmt->get_result();
+                            $data = $result->fetch_assoc();
+                            /* Check if the member of the couple already update the status or not */
+                            if( ($result->num_rows == 0) OR ($data["ref_user2"] == $_SESSION["user_id"] AND $data["image_ref_user2"] == "defaultImage1.png")){ 
                                 // You have to update your today's mood
                                 echo ('
                                     <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Write here your today\'s status '.$date.'</p> 
                                     <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
-                                        <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
-                                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
+                                    <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
+                                    <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
                                     </form>
-                                    ');
+                                ');
                             }
                             else{
-                                // Check if the second user already update the image
+                                // The user already update the status
                                 echo ('
                                     <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">You already update your status today: '.$date.'</p> 
                                     <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
                                         <input class="border rounded-pill border-2 border-primary shadow-lg form-control form-control-lg" name="inputText" type="text" placeholder="MyMood today is..." style="letter-spacing: 1px;font-family: Poppins, sans-serif;">
-                                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal">Upload my status</button>
+                                        <button class="btn btn-primary btn-lg" type="submit" style="margin: 5px;margin-top: 15px;" data-bs-target="#modal-2" data-bs-toggle="modal" disabled>Upload my status</button>
                                     </form>
                                 ');
                             }
                         }
                         else {
+                            // The user is not in a relation ship so the "MyMood" functionality is disabled
                             echo ('
                                 <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Find a partner to share your status and start the fight!</p>
                                 <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
@@ -408,7 +411,7 @@
                     <h4 class="modal-title">MyMood updated!</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>We got your new MyMood. Now for us to process the text and tell to your partner to update the status as well. You'll see the new couple of image as soon as possible!</p>
+                    <p>We got correctly your new MyMood. Now give us few seconds to process the text and get a funny image, meanwhile tell to your partner to update the status as well. You'll see the new couple of image as soon as possible!</p>
                 </div>
                 <div class="modal-footer"><button class="btn btn-primary" type="button">Got it, thank you!</button></div>
             </div>

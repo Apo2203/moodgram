@@ -124,7 +124,6 @@
                     </div>
                 
             <?php } ?>
-        ?>
         <footer class="text-center py-4">
             <div class="container">
                 <div class="row row-cols-1 row-cols-lg-3">

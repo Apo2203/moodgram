@@ -85,7 +85,7 @@
   filter: blur(3px);
 }
 
-.searchbar: hover {
+.searchbar:hover {
 }
 
 @media (max-width: 572px) {

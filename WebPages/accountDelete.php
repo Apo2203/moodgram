@@ -1,4 +1,6 @@
 <?php
+/* Deleting an account (remove user from database) */
+
 $mysqli = require __DIR__ . "/../dataBase/database.php";
 session_start();
 if(isset($_GET['id'])) {
@@ -12,8 +14,7 @@ if(isset($_GET['id'])) {
         $stmt->execute();
     }
 }
-
-session_destroy(); // it's here just to avoid security problem 
+session_destroy(); // Just to avoid security problem 
 header("Location: index.php");
 exit;
 ?>

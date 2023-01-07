@@ -1,9 +1,9 @@
 <?php
+/* Handling new profile pictures */
 $mysqli = require __DIR__ . "/database.php";
 session_start();
 
 if (isset($_POST["submit"]) && isset($_FILES["newImage"])){
-
     $img_name = $_FILES["newImage"]["name"];
     $img_size = $_FILES["newImage"]["size"];
     $tmp_name = $_FILES["newImage"]["tmp_name"];
@@ -14,19 +14,17 @@ if (isset($_POST["submit"]) && isset($_FILES["newImage"])){
             echo ("Sorry, your file is too big");
         }
         else{
-            //image extension
+            // Handling image extension
             $img_ex = pathinfo($img_name, PATHINFO_EXTENSION);
-
             $img_ex_lc = strtolower($img_ex);
-
             $allowed_exs = array ("jpg", "jpeg", "png");
             if(in_array($img_ex_lc, $allowed_exs)){
-                // Saving the new image on the server
+                // Saving the new image on the server creating a new unique ID
                 $new_img_name = uniqid("IMG-", true).'.'.$img_ex_lc;
                 $img_upload_path = "../assets/img/profilePictureImage/".$new_img_name;
                 move_uploaded_file($tmp_name, $img_upload_path);
 
-                // Insert into Database
+                // Update the Database with the new profile picture
                 $sql = "UPDATE user SET profilePicture = ? WHERE id = ?";
                 $stmt = $mysqli->stmt_init();
                 if (! $stmt->prepare($sql)) {
@@ -49,7 +47,6 @@ if (isset($_POST["submit"]) && isset($_FILES["newImage"])){
     }
 
 }
-
 else{
     header("Location: ../WebPages/setting.php");
 }

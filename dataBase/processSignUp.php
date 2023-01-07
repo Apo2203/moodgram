@@ -1,4 +1,6 @@
 <?php
+/* Handling registration of new user */
+
 if (empty($_POST["name"])) {
     die ("Name is required");
 }
@@ -17,16 +19,12 @@ if ($_POST["password"] !== $_POST["passwordConfirm"]){
 $hashedPassword = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
 $mysqli = require __DIR__ . "/database.php";
-
 $sql = "INSERT INTO user (name, surname, email, password_hash, age)
         VALUES (?, ?, ?, ?, ?)";
-
 $stmt = $mysqli->stmt_init();
-
 if (! $stmt->prepare($sql)) {
     die("SQL error: " . $mysqli->error);
 }
-
 $stmt->bind_param("ssssi",
                   $_POST["name"],
                   $_POST["surname"],

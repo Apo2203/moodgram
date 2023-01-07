@@ -1,11 +1,19 @@
 <?php
+/*  Homepage: here I have to allow the user to
+    - Update his mood
+    - Accept / Reject relationship request
+    - See the posts of the followed people
+    - Vote for an image in each post
+    - Delete post IF ADMIN
+*/
     $mysqli = require __DIR__ . "/../dataBase/database.php";
     session_start();
+
     $isAdmin = FALSE;
     $ImInRelationship = FALSE;
 
-    // Check to avoid some cybersecurity attack
-    if (! isset($_SESSION["user_id"])) header("Location: index.php");    
+    // Some check to avoid some cybersecurity attack
+    if (!isset($_SESSION["user_id"])) header("Location: index.php");    
     if (substr($_SERVER['REQUEST_URI'], -1) == '/') header ("Location: ".substr($_SERVER['REQUEST_URI'], 0, -1)."");
 
     // Accept relationship request
@@ -53,8 +61,7 @@
         if ($stmt->execute()) {
             $stmt->store_result();
             $numVotes = $stmt->num_rows;
-            // If it's the first time I vote this post
-            if ($numVotes == 0) {
+            if ($numVotes == 0) {   // It's the first time I vote this post
                 $setVote = "INSERT INTO vote VALUES(NULL, ?, ?, ?)";
                 $stmt = $mysqli->stmt_init();
                 if (! $stmt->prepare($setVote)) {
@@ -67,8 +74,7 @@
                 );  
                 $stmt->execute();
             }
-            // If I already voted a post and I would like to change the voted image
-            else{
+            else{   // If I already voted a post and I would like to change the voted image
                 $updateVote = "UPDATE vote SET voted_image = ? WHERE ref_user = ? AND ref_post = ?";
                 $stmt = $mysqli->stmt_init();
                 if (! $stmt->prepare($updateVote)) {
@@ -98,7 +104,7 @@
     $stmt->store_result();
     if ($stmt->num_rows == 1) $isAdmin = TRUE;
 
-    // Delete a post
+    // Delete a post (If Administrator)
     if(isset($_GET["deletePost"])){
         if($isAdmin == TRUE){
             $sql = "DELETE FROM `post` WHERE `post`.`id_post` = ?";
@@ -125,7 +131,6 @@
     $_SESSION["user_id"],
     $_SESSION["user_id"],
     );
-
     $stmt->execute();
     $stmt->store_result();
     if($stmt->num_rows > 0){
@@ -165,7 +170,10 @@
                         </form>
                     </div>
                 </div>
-                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a><a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
+                <ul class="navbar-nav ms-auto" style="height: 8px;"></ul>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="Profile.php?id_user=<?php echo($_SESSION["user_id"]) ?>" style="margin: 10px;padding: 8px 14px;">MyProfile</a>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="setting.php" style="background: #003893;border-color: #003893;margin: 10px;padding: 8px 14px;">Setting</a>
+                <a class="btn btn-primary ms-md-2" role="button" data-bss-hover-animate="pulse" href="logout.php" style="background: var(--bs-gray-700);border-color: var(--bs-gray-700);margin: 10px;padding: 8px 14px;">Logout</a>
             </div>
         </div>
     </nav>
@@ -175,10 +183,11 @@
                 <div class="shadow d-flex flex-column justify-content-center align-items-center backgroundContent" data-bss-hover-animate="pulse" style="background: url(&quot;../assets/img/emojibackground.png?h=2a5cd7d3a9c31ae0d60e9c7bac9d2531&quot;) center / cover no-repeat;">
                     <h1 class="display-1 fs-1 fw-bold text-center" style="color: rgb(255,255,255);letter-spacing: 4px;line-height: 48px;font-family: Aboreto, serif;">Welcome back...</h1>
                     <?php
-                    // Check If the user still have to update the mood or not
+                        // Check If the user have to update the mood or not (If is not in a relationship he can't)
                         if ($ImInRelationship == TRUE){
                             date_default_timezone_set('Europe/Rome');
                             $date = date('Y-m-d', time());
+
                             $sql = "SELECT * FROM post WHERE post.date = ? AND (ref_user1 = ? OR ref_user2 = ?)";
                             $stmt = $mysqli->stmt_init();
                             if (! $stmt->prepare($sql)) {
@@ -189,10 +198,10 @@
                             $_SESSION["user_id"],
                             $_SESSION["user_id"],
                             );
-                        
                             $stmt->execute();
                             $result = $stmt->get_result();
                             $data = $result->fetch_assoc();
+
                             /* Check if the member of the couple already update the status or not */
                             if( ($result->num_rows == 0) OR ($data["ref_user2"] == $_SESSION["user_id"] AND $data["image_ref_user2"] == "defaultImage1.png")){ 
                                 // You have to update your today's mood
@@ -204,8 +213,7 @@
                                     </form>
                                 ');
                             }
-                            else{
-                                // The user already update the status
+                            else{   // The user already update the status today
                                 echo ('
                                     <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">You already update your status today: '.$date.'</p> 
                                     <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
@@ -215,8 +223,7 @@
                                 ');
                             }
                         }
-                        else {
-                            // The user is not in a relation ship so the "MyMood" functionality is disabled
+                        else {  // The user is not in a relation ship so "MyMood" functionality is disabled
                             echo ('
                                 <p class="fs-4 text-center" style="font-family: Aboreto, serif;font-weight: bold;">Find a partner to share your status and start the fight!</p>
                                 <form class="text-center" method="post" action="../textToImageAI/textToImage.php">
@@ -231,6 +238,7 @@
         </section>
         <section style="margin-top: 10rem;">
             <?php
+            /* A query to database to load every post (including calculation of votes) in the right order */
                 $sql = "SELECT p.date, p.id_post, p.ref_user1, p.ref_user2, p.image_ref_user1, p.image_ref_user2, u1.id as id1, u2.id as id2, u1.name AS name1, u1.surname AS surname1, u2.name AS name2, u2.surname AS surname2, u1.profilePicture AS proPic1, u2.profilePicture AS proPic2, 
                 (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
                 FROM post p, user u1, user u2
@@ -239,77 +247,71 @@
                 ORDER BY date DESC";                
                         
                 $result = $mysqli->query($sql);
-                
-                if (TRUE) {
-                    while ($data = $result->fetch_assoc())
-                    {
-                        echo('
-                            <div class="container Cardsize" id="pos'.$data['id_post'].'" style="margin-bottom: 7rem;">
-                                <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
-                                    <div class="col">
-                                        <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
-                                            <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
+                while ($data = $result->fetch_assoc()){ /* While the database give me post I'll show them */
+                    echo('
+                        <div class="container Cardsize" id="pos'.$data['id_post'].'" style="margin-bottom: 7rem;">
+                            <div class="row" style="margin: 0;box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;margin-bottom: 2rem;padding: 1rem;border-radius: 3rem;background: #E5A904;">
+                                <div class="col">
+                                    <p class="lead fs-2 text-start" style="font-family: Poppins, sans-serif;color: #250001;text-shadow: 0px 0px 0px var(--bs-black);margin-bottom: 0.5rem;">
+                                        <span style="font-weight: normal !important;">'.$data['name1'].' '.$data['surname1'].' &amp; '.$data['name2'].' '.$data['surname2'].'</span>
+                                    </p>
+                                    <a href="Profile.php?id_user='.$data['id1'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                    <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
+                                        <strong>'.$data['voteImg1'].'</strong>
+                                    </p>
+                                    <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
+                                    <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
+                                        <strong>'.$data['voteImg2'].'</strong>
+                                    </p>
+                                    <div>
+                                        <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;">
+                                            <em>'.$data['date'].'</em>
                                         </p>
-                                        <a href="Profile.php?id_user='.$data['id1'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic1'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                        <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
-                                            <strong>'.$data['voteImg1'].'</strong>
-                                        </p>
-                                        <a href="Profile.php?id_user='.$data['id2'].'"><img src="../assets/img/profilePictureImage/'.$data['proPic2'].'" style="width: 3rem;border-radius: 3rem;"></a>
-                                        <p class="fs-6 fw-normal" style="position: relative;display: inline;padding: 0.5em;color: #250001;">
-                                            <strong>'.$data['voteImg2'].'</strong>
-                                        </p>
-                                        <div>
-                                            <p class="lead fs-4 fw-light text-start float-start" style="padding-top: 0.3rem;font-family: Abel, sans-serif;color: #250001;">
-                                                <em>'.$data['date'].'</em>
-                                            </p>
-                                            <div class="dropend float-end">
-                                                <button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;">
-                                                    <i class="far fa-sun"></i>
-                                                </button>
-                                                ');
-                                                if ($isAdmin == "TRUE"){
-                                                    echo('
-                                                        <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
-                                                            <a class="dropdown-item" href="#">Report Post</a>
-                                                            <a class="dropdown-item" href="./home.php?deletePost='.$data["id_post"].'" style="color: rgb(255,0,0);">Delete post</a>
-                                                        </div>
-                                                    ');
-                                                }
-                                                else{
-                                                    echo('
-                                                        <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
-                                                            <a class="dropdown-item" href="#">Report Post</a>
-                                                        </div>
-                                                    ');
-                                                }
+                                        <div class="dropend float-end">
+                                            <button class="btn btn-primary" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bss-hover-animate="pulse" type="button" style="border-radius: 3rem;background: #4f94cf;">
+                                                <i class="far fa-sun"></i>
+                                            </button>
+                                            ');
+                                            if ($isAdmin == "TRUE"){
                                                 echo('
-                                            </div>
+                                                    <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
+                                                        <a class="dropdown-item" href="#">Report Post</a>
+                                                        <a class="dropdown-item" href="./home.php?deletePost='.$data["id_post"].'" style="color: rgb(255,0,0);">Delete post</a>
+                                                    </div>
+                                                ');
+                                            }
+                                            else{
+                                                echo('
+                                                    <div class="dropdown-menu dropdown-menu-dark" style="border-radius: 1rem;">
+                                                        <a class="dropdown-item" href="#">Report Post</a>
+                                                    </div>
+                                                ');
+                                            }
+                                            echo('
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row" style="margin: 0;">
-                                    <div class="col col-style-sx" data-bss-hover-animate="pulse">
-                                        <a href="home.php?id_post='.$data['id_post'].'&voted_image=0#pos'.$data['id_post'].'">
-                                            <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
-                                                <i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i>
-                                            </div>
-                                        </a>
-                                        <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'">
-                                    </div>
-                                    <div class="col col-style-dx" data-bss-hover-animate="pulse">
-                                        <a href="home.php?id_post='.$data['id_post'].'&voted_image=1#pos'.$data['id_post'].'">
-                                            <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
-                                                <i class="fas fa-heart"></i>
-                                            </div>
-                                        </a>
-                                        <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'">
-                                    </div>
+                            </div>
+                            <div class="row" style="margin: 0;">
+                                <div class="col col-style-sx" data-bss-hover-animate="pulse">
+                                    <a href="home.php?id_post='.$data['id_post'].'&voted_image=0#pos'.$data['id_post'].'">
+                                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
+                                            <i class="fas fa-heart" style="font-size: 4rem;color: var(--bs-red);"></i>
+                                        </div>
+                                    </a>
+                                    <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user1'].'">
+                                </div>
+                                <div class="col col-style-dx" data-bss-hover-animate="pulse">
+                                    <a href="home.php?id_post='.$data['id_post'].'&voted_image=1#pos'.$data['id_post'].'">
+                                        <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center overpicture-trigger">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                    </a>
+                                    <img class="img-fluid image-style" src="../assets/img/generatedImage/'.$data['image_ref_user2'].'">
                                 </div>
                             </div>
-                        ');
-                    }
-                } else{
-                die($mysqli->error . " " . $mysqli->error);
+                        </div>
+                    ');
                 }
             ?>
 
@@ -325,7 +327,7 @@
             <div class="container">
                 <div class="row row-cols-1 row-cols-lg-3">
                     <div class="col">
-                        <p class="text-muted my-2">Copyright&nbsp;© 2022 Moodgram</p>
+                        <p class="text-muted my-2">Copyright&nbsp;© 2023 Moodgram</p>
                     </div>
                     <div class="col">
                         <ul class="list-inline my-2">
@@ -357,14 +359,13 @@
         </footer>
     </section>
 
-    <!-- VIEW REQUEST RELATIONSHIP-->
     <?php 
-    
-        //CHECK RELATIONSHIP REQUEST
-        $sql = "SELECT u.profilePicture as proPic, u.name as userName, u.surname as userSurname, u.id as id FROM user u, relationship r WHERE r.ref_user_1 = u.id AND r.ref_user_2 = ? AND r.confirmed = 0";
-        
+        //Check for relationship request
+        $sql = "SELECT u.profilePicture as proPic, u.name as userName, u.surname as userSurname, u.id as id 
+                FROM user u, relationship r 
+                WHERE r.ref_user_1 = u.id AND r.ref_user_2 = ? AND r.confirmed = 0";
+
         $stmt = $mysqli->stmt_init();
-        
         if (! $stmt->prepare($sql)) {
             die("SQL error: " . $mysqli->error);
         }    
@@ -373,9 +374,7 @@
         $stmt->execute();
         $stmt->store_result();
         $rows = $stmt->num_rows;
-
-        if($rows != 0){
-            //REQUEST FOUNDED
+        if($rows != 0){ // There is a relationship request waiting for an answer
             /* bind variables to prepared statement */
             $stmt->bind_result($proPic, $userName, $UserSurname, $id);
             $stmt->fetch();
@@ -402,8 +401,6 @@
     
     ?>
     
-    <!-- END -->
-
     <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">

@@ -1,6 +1,10 @@
 <?php
+/* Handling User's information updating */
+
 session_start(); 
-$updateBoth = FALSE; //Variable that make me know if the user would like to update just name username or also the password
+
+//Variable that make me know if the user would like to update just name and username or also the password
+$updateBoth = FALSE; 
 
 if (empty($_POST["name"])) {
     die ("Name is required, please write your name in the correct form");
@@ -8,7 +12,6 @@ if (empty($_POST["name"])) {
 if (empty($_POST["surname"])) {
     die ("Surname is required, please write your surname in the correct form");
 }
-
 if (! empty($_POST["password"])){
     $updateBoth = TRUE;
     if (empty($_POST["passwordConfirm"])){
@@ -55,7 +58,6 @@ if($updateBoth){
 else{
     $sql = " UPDATE user SET name= ?, surname= ? WHERE id = ? ";
     $stmt = $mysqli->stmt_init();
-    
     if (! $stmt->prepare($sql)) {
         die("SQL error: " . $mysqli->error);
     }
@@ -74,8 +76,4 @@ else{
         die($mysqli->error . " " . $mysqli->error);
     }
 }
-
-
-
-
 ?> 

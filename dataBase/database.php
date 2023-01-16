@@ -4,7 +4,7 @@
 $host = "localhost";
 $dbname = "moodGramDB";
 $username = "root";
-$password = ""; 
+$password = "Anker"; 
 
 $mysqli = new mysqli(hostname: $host, username: $username, password: $password, database: $dbname);
 if ($mysqli->connect_errno){

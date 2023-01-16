@@ -1,3 +1,5 @@
 
 *.jpeg
 *.jpg
+dataBase/database.php
+textToImageAI/textToImage.php

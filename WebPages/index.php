@@ -21,8 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST"){
 
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+    <head>
+    <title> Welcame to MoodGram </title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=2">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>dashboardpost</title>

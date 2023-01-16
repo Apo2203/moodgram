@@ -252,9 +252,10 @@ $stmt->fetch();
 <html lang="en">
 
 <head>
+    <title> Moodgram </title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=2">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>dashboardpost</title>
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css?h=025df1ec88740cad5ff14bb3380da6dd">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abel&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Aboreto&amp;display=swap">
@@ -339,7 +340,7 @@ $stmt->fetch();
             (SELECT COUNT(*) FROM vote v1 WHERE (v1.ref_post) = (p.id_post) AND v1.voted_image = 0) AS voteImg1, 
             (SELECT COUNT(*) FROM vote v2 WHERE (v2.ref_post) = (p.id_post) AND v2.voted_image = 1) AS voteImg2
             FROM post p, user u1, user u2
-            WHERE p.ref_user1 = u1.id AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1 WHERE ref_user1 = ? OR ref_user2 = ?)
+            WHERE p.ref_user1 = u1.id AND p.visibility = 1 AND p.ref_user2 = u2.id AND p.id_post = ANY (SELECT p1.id_post FROM post p1 WHERE ref_user1 = ? OR ref_user2 = ?)
             GROUP BY p.id_post
             ORDER BY date DESC";
             $stmt = $mysqli->stmt_init();
